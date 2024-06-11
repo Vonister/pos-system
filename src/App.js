@@ -6,6 +6,7 @@ import Pos from './scenes/pos';
 import { ColorModeContext, useMode } from './theme';
 
 import themes from './themes';
+import ToastCon from './themes/toast';
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -27,6 +28,7 @@ function App() {
               <Route path="/pos" element={<Pos />} />
             </Routes>
           </main>
+          <ToastCon />
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>

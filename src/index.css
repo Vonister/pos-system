@@ -34,3 +34,7 @@ body,
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.css-sox5kk-MuiBackdrop-root {
+  background-color: rgb(0 0 0 / 8%) !important;
+}

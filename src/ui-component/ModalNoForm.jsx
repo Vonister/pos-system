@@ -36,7 +36,7 @@ const ModalNoForm = ({
     transform: 'translate(-50%, -50%)',
     width: widthModal,
     bgcolor: 'background.paper',
-    boxShadow: 4,
+    boxShadow: 1,
     px: 2,
     pb: 3,
     borderRadius: 2,
