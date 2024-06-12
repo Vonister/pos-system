@@ -22,6 +22,7 @@ import {
 } from "../../ui-component/StyledAccordion";
 import ModalWrapper from "../../ui-component/ModalWrapper";
 import { foods } from "../../data/foodData";
+import Swal from "sweetalert2";
 
 export default function Cart(props) {
   // Destructuring props
@@ -97,6 +98,13 @@ export default function Cart(props) {
             : food;
         });
       }
+    });
+
+    Swal.fire({
+      icon: "success",
+      html: `<h3>Successful Transaction</h3>
+      <h2>Change: PHP 100.00</h2>
+      `,
     });
 
     // Update the state with the new foodsList

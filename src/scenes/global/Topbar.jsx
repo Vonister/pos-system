@@ -37,9 +37,11 @@ const Topbar = () => {
       >
         <Box display={"flex"} sx={{ background: "rgb(238, 242, 246)" }}>
           <Sidebar selected={selected} setSelected={setSelected} />
-          {menuItems.items.map((item) => {
+          {menuItems.items.map((item, idx) => {
             return item.title === selected ? (
-              <Box sx={{ width: "100%", p: 4 }}>{item.component}</Box>
+              <Box key={idx} sx={{ width: "100%", p: 4 }}>
+                {item.component}
+              </Box>
             ) : (
               ""
             );

@@ -30,7 +30,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 const Sidebar = ({ selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <Box

@@ -10,7 +10,6 @@ const ModalNoForm = ({
   size = "modal-normal",
   sx = {},
 }) => {
-  console.log(sx);
   var widthModal;
   var height = "auto";
   switch (size) {

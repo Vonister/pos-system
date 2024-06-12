@@ -111,18 +111,20 @@ export default function FoodMenu({
               Category
             </Typography>
             <Box display={"flex"}>
-              {categories.map((category, index) => (
+              {categories.map((obj, index) => (
                 <Button
                   className={`category-button
-                   ${activeCategory === category ? "active" : ""}`}
+                   ${activeCategory === obj.category ? "active" : ""}`}
                   key={index}
-                  variant={activeCategory === category ? "outlined" : "text"}
+                  variant={
+                    activeCategory === obj.category ? "outlined" : "text"
+                  }
                   onClick={() => {
-                    setActiveCategory(category);
+                    setActiveCategory(obj.category);
                     setCurrentPage(1);
                   }}
                 >
-                  {category}
+                  {obj.category}
                 </Button>
               ))}
             </Box>
