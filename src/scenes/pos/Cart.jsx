@@ -1,4 +1,4 @@
-import CancelIcon from '@mui/icons-material/Cancel';
+import CancelIcon from "@mui/icons-material/Cancel";
 import {
   Alert,
   Box,
@@ -12,16 +12,16 @@ import {
   IconButton,
   TextField,
   Typography,
-} from '@mui/material';
-import { useEffect, useState } from 'react';
-import ModalNoForm from '../../ui-component/ModalNoForm';
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import ModalNoForm from "../../ui-component/ModalNoForm";
 import {
   StyledAccordion,
   StyledAccordionDetails,
   StyledAccordionSummary,
-} from '../../ui-component/StyledAccordion';
-import ModalWrapper from '../../ui-component/ModalWrapper';
-import { foods } from '../../data/foodData';
+} from "../../ui-component/StyledAccordion";
+import ModalWrapper from "../../ui-component/ModalWrapper";
+import { foods } from "../../data/foodData";
 
 export default function Cart(props) {
   // Destructuring props
@@ -38,7 +38,7 @@ export default function Cart(props) {
   } = props;
 
   // State variables
-  const [expanded, setExpanded] = useState('');
+  const [expanded, setExpanded] = useState("");
   const [modal, setModal] = useState(false);
   const [proceedModal, setProceedModal] = useState(false);
   const [payment, setPayment] = useState(0);
@@ -71,18 +71,42 @@ export default function Cart(props) {
 
     // Iterate through cartItems and update stocks in the new foodsList
     cartItems.forEach((item) => {
-      updatedFoodsList = updatedFoodsList.map((food) => {
-        return item.name === food.name
-          ? {
-              ...food,
-              stocks: food.stocks - 1,
-            }
-          : food;
-      });
+      if (item.inclusion) {
+        const filteredCartItems = updatedFoodsList.filter((list) =>
+          item.inclusion.includes(list.id)
+        );
+        filteredCartItems.forEach((filterItem) => {
+          updatedFoodsList = updatedFoodsList.map((food) => {
+            return filterItem.id === food.id
+              ? {
+                  ...food,
+                  stocks: food.stocks - item.quantity,
+                }
+              : food;
+          });
+        });
+        // Update the state with the new foodsList
+        setFoodsList(updatedFoodsList);
+      } else {
+        updatedFoodsList = updatedFoodsList.map((food) => {
+          return item.name === food.name
+            ? {
+                ...food,
+                stocks: food.stocks - item.quantity,
+              }
+            : food;
+        });
+      }
     });
 
     // Update the state with the new foodsList
     setFoodsList(updatedFoodsList);
+
+    //Return the state to initial state
+    setProceedModal(false);
+    setPayment(0);
+    setChange(0);
+    setCartItems([]);
   };
 
   return (
@@ -103,7 +127,7 @@ export default function Cart(props) {
           />
 
           {/* Orders in the cart */}
-          <CardContent sx={{ py: 0, maxHeight: '450px', overflowY: 'scroll' }}>
+          <CardContent sx={{ py: 0, maxHeight: "450px", overflowY: "scroll" }}>
             {cartItems.length > 0 ? (
               <>
                 {cartItems.map((cartData, index) => (
@@ -117,17 +141,17 @@ export default function Cart(props) {
                       id={`${index}d-header`}
                     >
                       <Typography
-                        display={'flex'}
-                        flexDirection={'column'}
+                        display={"flex"}
+                        flexDirection={"column"}
                         variant="h5"
                         color="text.secondary"
                       >
-                        {cartData.name}
-                        <Typography sx={{ fontWeight: '600', ml: 1 }}>
+                        {cartData.name} {cartData?.option}
+                        <Typography sx={{ fontWeight: "600", ml: 1 }}>
                           x {cartData.quantity}
                         </Typography>
                       </Typography>
-                      <Typography display={'flex'} alignItems={'center'}>
+                      <Typography display={"flex"} alignItems={"center"}>
                         PHP {(cartData.price * cartData.quantity).toFixed(2)}
                         <IconButton
                           onClick={() => {
@@ -136,12 +160,12 @@ export default function Cart(props) {
                             );
                             setExpanded(false);
                           }}
-                          sx={{ marginLeft: '5px' }}
+                          sx={{ marginLeft: "5px" }}
                         >
                           <CancelIcon
                             sx={{
-                              color: '#9f9f9e',
-                              fontSize: '18px',
+                              color: "#9f9f9e",
+                              fontSize: "18px",
                             }}
                           />
                         </IconButton>
@@ -183,7 +207,7 @@ export default function Cart(props) {
               <Alert
                 variant="filled"
                 severity="info"
-                sx={{ background: 'whitesmoke', color: '#333' }}
+                sx={{ background: "whitesmoke", color: "#333" }}
               >
                 There's no item in the cart
               </Alert>
@@ -192,21 +216,21 @@ export default function Cart(props) {
 
           {/* Total to pay and discount information */}
           <CardActions>
-            <Box display={'flex'} flexDirection={'column'} width={'100%'}>
-              <Box display={'flex'} justifyContent={'space-between'}>
+            <Box display={"flex"} flexDirection={"column"} width={"100%"}>
+              <Box display={"flex"} justifyContent={"space-between"}>
                 <Typography>Subtotal</Typography>
                 <Typography>PHP {subtotal.toFixed(2)}</Typography>
               </Box>
-              <Box display={'flex'} justifyContent={'space-between'}>
+              <Box display={"flex"} justifyContent={"space-between"}>
                 <Typography>Discount</Typography>
                 <Typography>{discount}%</Typography>
               </Box>
-              <Box display={'flex'} justifyContent={'space-between'} mt={2}>
+              <Box display={"flex"} justifyContent={"space-between"} mt={2}>
                 <Typography variant="h4">Payable Amount</Typography>
                 <Typography>PHP {payable.toFixed(2)}</Typography>
               </Box>
 
-              <Box display={'flex'} justifyContent={'space-between'} mt={2}>
+              <Box display={"flex"} justifyContent={"space-between"} mt={2}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -253,37 +277,38 @@ export default function Cart(props) {
               handleClose={() => setProceedModal(false)}
               title="Payment"
               handleSubmit={handleSubmit}
+              isButton={payment >= payable ? true : false}
             >
               {/* Payment form */}
-              <Box display={'flex'} flexDirection={'column'} width={'100%'}>
-                <Box display={'flex'} justifyContent={'space-between'}>
+              <Box display={"flex"} flexDirection={"column"} width={"100%"}>
+                <Box display={"flex"} justifyContent={"space-between"}>
                   <Typography>Subtotal</Typography>
                   <Typography>PHP {subtotal.toFixed(2)}</Typography>
                 </Box>
-                <Box display={'flex'} justifyContent={'space-between'}>
+                <Box display={"flex"} justifyContent={"space-between"}>
                   <Typography>Discount</Typography>
                   <Typography>{discount}%</Typography>
                 </Box>
-                <Box display={'flex'} justifyContent={'space-between'}>
+                <Box display={"flex"} justifyContent={"space-between"}>
                   <Typography>Payable Amount</Typography>
                   <Typography variant="h4">PHP {payable.toFixed(2)}</Typography>
                 </Box>
               </Box>
 
               {/* Payment options */}
-              <Box display={'flex'} flexDirection={'column'} width={'100%'}>
+              <Box display={"flex"} flexDirection={"column"} width={"100%"}>
                 <Grid container>
                   <Grid item xs={12}>
                     <Typography mb={1} variant="h4">
                       Payment
                     </Typography>
-                    <Box p={3} pl={0} pt={0} display={'flex'}>
+                    <Box p={3} pl={0} pt={0} display={"flex"}>
                       {/* Payment buttons */}
                       {[20, 50, 100, 500, 1000].map((amount) => (
                         <Button
                           key={amount}
                           sx={{ mx: 1 }}
-                          variant={'outlined'}
+                          variant={"outlined"}
                           onClick={() => handlePayment(amount)}
                         >
                           +{amount}
@@ -297,7 +322,7 @@ export default function Cart(props) {
                     {/* Button for exact payment */}
                     <Button
                       sx={{ mx: 1 }}
-                      variant={'contained'}
+                      variant={"contained"}
                       onClick={() => {
                         setPayment(payable);
                         setChange(0);
@@ -315,7 +340,7 @@ export default function Cart(props) {
                         name="payment"
                         label="Payment"
                         variant="outlined"
-                        value={payment}
+                        value={payment === 0 ? "" : payment}
                         onChange={(e) => {
                           setPayment(Number(e.target.value));
                           setChange(Number(e.target.value) - payable);
@@ -325,7 +350,7 @@ export default function Cart(props) {
                     </FormControl>
                   </Grid>
                 </Grid>
-                <Box display={'flex'} justifyContent={'space-between'} mt={2}>
+                <Box display={"flex"} justifyContent={"space-between"} mt={2}>
                   <Typography variant="h4">Change</Typography>
                   <Typography>PHP {change.toFixed(2)}</Typography>
                 </Box>

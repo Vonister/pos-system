@@ -1,31 +1,30 @@
-import { useEffect, useState } from 'react';
-import DataTable from 'react-data-table-component';
+import { useEffect, useState } from "react";
+import DataTable from "react-data-table-component";
 
 //material UI Imports
-import { Box, Grid } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Box, Grid } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 //Custom Imports
-import { tableCustomStyle } from 'themes/tableCustomStyle';
-import { dataFilter } from 'ui-component/datatable/DataFilter';
-import DataTableActions from 'ui-component/datatable/DataTableActions';
-import { exportData } from 'ui-component/datatable/DataTableExport';
+import { tableCustomStyle } from "../../themes/tableCustomStyle";
+import { dataFilter } from "./DataFilter";
+import DataTableActions from "./DataTableActions";
+import { exportData } from "./DataTableExport";
 
 //Components
-import NoResults from 'views/404/NoResults';
 
-import TableChartIcon from '@mui/icons-material/TableChart';
-import DataTableSkeleton from 'ui-component/cards/Skeleton/DataTableSkeleton';
-import DataTableSubHeader from './DataTableSubHeader';
-import { global } from 'GlobalVariables';
+import TableChartIcon from "@mui/icons-material/TableChart";
+import DataTableSkeleton from "../cards/Skeleton/DataTableSkeleton";
+import DataTableSubHeader from "./DataTableSubHeader";
+import NotFoundPage from "../../scenes/global/NotFoundPage";
 
 const Table = (props) => {
   const theme = useTheme();
   const styles = tableCustomStyle(theme);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [selectedFilter, setSelectedFilter] = useState([]);
   const [fromDate, setFromDate] = useState(null);
-  const [selectedDateColumn, setSelectedDateColumn] = useState('');
+  const [selectedDateColumn, setSelectedDateColumn] = useState("");
   const [toDate, setToDate] = useState(null);
   const [pending, setPending] = useState(true);
 
@@ -39,13 +38,13 @@ const Table = (props) => {
 
   const tableTitle = (
     <Box
-      sx={{ fontSize: '18px', fontWeight: '600', paddingBlock: 2 }}
-      display={'flex'}
-      alignItems={'center'}
+      sx={{ fontSize: "18px", fontWeight: "600", paddingBlock: 2 }}
+      display={"flex"}
+      alignItems={"center"}
     >
       <TableChartIcon
         color="secondary"
-        style={{ fontSize: '23px', marginRight: '0.5rem' }}
+        style={{ fontSize: "23px", marginRight: "0.5rem" }}
       />
       {title}
     </Box>
@@ -53,8 +52,8 @@ const Table = (props) => {
   const resetState = () => {
     setFromDate(null);
     setToDate(null);
-    setSearchText('');
-    setSelectedDateColumn('');
+    setSearchText("");
+    setSelectedDateColumn("");
   };
 
   const filteredData = dataFilter({
@@ -115,19 +114,15 @@ const Table = (props) => {
       subHeaderWrap
       customStyles={styles}
       noDataComponent={
-        <Grid
-          container
-          spacing={global.appStyle.gridSpacing}
-          justifyContent={'center'}
-        >
-          <NoResults />
+        <Grid container spacing={3} justifyContent={"center"}>
+          <NotFoundPage />
         </Grid>
       }
       paginationComponentOptions={{
-        rowsPerPageText: 'Rows Per Page',
-        rangeSeparatorText: 'of',
+        rowsPerPageText: "Rows Per Page",
+        rangeSeparatorText: "of",
         selectAllRowsItem: true,
-        selectAllRowsItemText: 'All',
+        selectAllRowsItemText: "All",
       }}
       paginationRowsPerPageOptions={[10, 20, 30, 50, 100]}
       actions={

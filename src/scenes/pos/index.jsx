@@ -1,11 +1,11 @@
-import SearchIcon from '@mui/icons-material/Search';
-import { Box, Grid, IconButton, InputBase } from '@mui/material';
-import Header from '../../ui-component/Header';
-import MainCard from '../../ui-component/cards/MainCard';
-import Cart from './Cart';
-import FoodMenu from './FoodMenu';
-import { useState } from 'react';
-import { foods } from '../../data/foodData';
+import SearchIcon from "@mui/icons-material/Search";
+import { Box, Grid, IconButton, InputBase } from "@mui/material";
+import Header from "../../ui-component/Header";
+import MainCard from "../../ui-component/cards/MainCard";
+import Cart from "./Cart";
+import FoodMenu from "./FoodMenu";
+import { useState } from "react";
+import { foods } from "../../data/foodData";
 
 const Pos = () => {
   // State variables to manage cart items, subtotal, discount, payable amount, search query, and the list of foods.
@@ -13,7 +13,7 @@ const Pos = () => {
   const [subtotal, setSubtotal] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [payable, setPayable] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [foodsList, setFoodsList] = useState(foods);
 
   // Function to calculate subtotal and payable amount based on cart items and discount.
@@ -38,16 +38,16 @@ const Pos = () => {
 
   return (
     <Box m="20px">
-      <Grid container spacing={3}>
+      <Grid container spacing={3} p={3}>
         {/* Main content area for the menu list */}
         <Grid item xs={9}>
-          <MainCard
+          {/* <MainCard
             title="Menu List"
             secondary={
               <Box
                 display="flex"
                 borderRadius="3px"
-                backgroundColor={'#f5f5f5'}
+                backgroundColor={"#f5f5f5"}
               >
                 <InputBase
                   sx={{ ml: 2, flex: 1 }}
@@ -59,16 +59,16 @@ const Pos = () => {
                 </IconButton>
               </Box>
             }
-          >
-            <FoodMenu
-              foodsList={foodsList}
-              cartItems={cartItems}
-              setCartItems={setCartItems}
-              searchQuery={searchQuery}
-              calculate={calculate}
-              setFoodsList={setFoodsList}
-            />
-          </MainCard>
+          > */}
+          <FoodMenu
+            foodsList={foodsList}
+            cartItems={cartItems}
+            setCartItems={setCartItems}
+            searchQuery={searchQuery}
+            calculate={calculate}
+            setFoodsList={setFoodsList}
+          />
+          {/* </MainCard> */}
         </Grid>
 
         {/* Sidebar area for the cart */}

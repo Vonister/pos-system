@@ -1,41 +1,43 @@
-import CloseIcon from '@mui/icons-material/Close';
-import { Backdrop, Fade, IconButton, Modal, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import CloseIcon from "@mui/icons-material/Close";
+import { Backdrop, Fade, IconButton, Modal, Typography } from "@mui/material";
+import { Box } from "@mui/system";
 
 const ModalNoForm = ({
   children,
   open,
   handleClose,
-  title = 'Modal Title',
-  size = 'modal-normal',
+  title = "Modal Title",
+  size = "modal-normal",
+  sx = {},
 }) => {
+  console.log(sx);
   var widthModal;
-  var height = 'auto';
+  var height = "auto";
   switch (size) {
-    case 'modal-sm':
+    case "modal-sm":
       widthModal = 300;
       break;
-    case 'modal-normal':
+    case "modal-normal":
       widthModal = 500;
       break;
-    case 'modal-lg':
+    case "modal-lg":
       widthModal = 800;
       break;
-    case 'modal-xl':
+    case "modal-xl":
       widthModal = 1140;
       break;
-    case 'modal-fullscreen':
-      widthModal = '100%';
-      height = '100%';
+    case "modal-fullscreen":
+      widthModal = "100%";
+      height = "100%";
       break;
   }
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: widthModal,
-    bgcolor: 'background.paper',
+    bgcolor: "background.paper",
     boxShadow: 1,
     px: 2,
     pb: 3,
@@ -60,7 +62,7 @@ const ModalNoForm = ({
         <Box sx={style}>
           <Box
             sx={{
-              borderBottom: '1px solid lightgray',
+              borderBottom: "1px solid lightgray",
               p: 1,
               pb: 2,
               pr: 0,
@@ -77,10 +79,12 @@ const ModalNoForm = ({
               {title}
             </Typography>
             <IconButton onClick={handleClose}>
-              <CloseIcon sx={{ fontSize: '18px' }} />
+              <CloseIcon sx={{ fontSize: "18px" }} />
             </IconButton>
           </Box>
-          <Box sx={{ p: 2, py: 3, maxHeight: '90vh', overflowY: 'auto' }}>
+          <Box
+            sx={{ p: 2, py: 3, maxHeight: "90vh", overflowY: "auto", ...sx }}
+          >
             {children}
           </Box>
         </Box>

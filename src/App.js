@@ -25,7 +25,7 @@ function App() {
           <main className="content">
             <Topbar />
             <Routes>
-              <Route path="/pos" element={<Pos />} />
+              <Route path="/" element={<Pos />} />
             </Routes>
           </main>
           <ToastCon />

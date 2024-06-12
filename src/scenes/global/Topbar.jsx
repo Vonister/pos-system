@@ -1,38 +1,51 @@
-import { Box, IconButton, Typography, useTheme } from '@mui/material';
-import { useContext } from 'react';
-import { ColorModeContext, tokens } from '../../theme';
-import InputBase from '@mui/material/InputBase';
-import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
-import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import logo from '../../assets/images/logo.png';
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import { Box, IconButton, Typography } from "@mui/material";
+import logo from "../../assets/images/logo.png";
+import { useState } from "react";
+import ModalNoForm from "../../ui-component/ModalNoForm";
+import Sidebar from "./Sidebar";
+import menuItems from "./menuItems";
 
 const Topbar = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const colorMode = useContext(ColorModeContext);
-
+  const [settingsModal, setSettingsModal] = useState(false);
+  const [selected, setSelected] = useState("Menu Management");
   return (
     <Box
       display="flex"
       justifyContent="space-between"
-      backgroundColor={'#fff'}
+      backgroundColor={"#fff"}
       p={2}
     >
-      <Typography variant="h4" display={'flex'} alignItems={'center'}>
-        <img src={logo} alt="" width={50} style={{ marginRight: '10px' }} />{' '}
+      <Typography variant="h4" display={"flex"} alignItems={"center"}>
+        <img src={logo} alt="" width={50} style={{ marginRight: "10px" }} />{" "}
         WcDonalds
       </Typography>
 
       {/* ICONS */}
       <Box display="flex">
-        <IconButton>
+        <IconButton onClick={() => setSettingsModal(true)}>
           <SettingsOutlinedIcon />
         </IconButton>
       </Box>
+
+      <ModalNoForm
+        open={settingsModal}
+        handleClose={() => setSettingsModal(false)}
+        size="modal-fullscreen"
+        title="Settings"
+        sx={{ p: "0 !important" }}
+      >
+        <Box display={"flex"} sx={{ background: "rgb(238, 242, 246)" }}>
+          <Sidebar selected={selected} setSelected={setSelected} />
+          {menuItems.items.map((item) => {
+            return item.title === selected ? (
+              <Box sx={{ width: "100%", p: 4 }}>{item.component}</Box>
+            ) : (
+              ""
+            );
+          })}
+        </Box>
+      </ModalNoForm>
     </Box>
   );
 };

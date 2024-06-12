@@ -1,9 +1,7 @@
-import Logo from '../../assets/images/pages/bsulogo.png';
-
 export const exportData = (props) => {
   const { type, columns, data, title } = props;
-  if (type === 'print') {
-    const printWindow = window.open('', '_blank');
+  if (type === "print") {
+    const printWindow = window.open("", "_blank");
     printWindow.document.write(`
   <html>
     <head>
@@ -119,7 +117,7 @@ export const exportData = (props) => {
     </head>
     <body>
       <div class="print-header">
-        <img src="${Logo}" alt="Logo" height="100" />
+       
         <div class="text-center">
           <h4 class="fw-bold">Republic of the Philippines</h4>
           <h3 class="fw-bold">BATANGAS STATE UNIVERSITY</h3>
@@ -136,7 +134,7 @@ export const exportData = (props) => {
       <table class="print-table">
         <thead>
           <tr>
-            ${columns.map((column) => `<th>${column.name}</th>`).join('')}
+            ${columns.map((column) => `<th>${column.name}</th>`).join("")}
           </tr>
         </thead>
         <tbody>
@@ -145,12 +143,12 @@ export const exportData = (props) => {
               (row) => `
             <tr>
               ${columns
-                .map((column) => `<td>${column?.selector(row) || ''}</td>`)
-                .join('')}
+                .map((column) => `<td>${column?.selector(row) || ""}</td>`)
+                .join("")}
             </tr>
           `
             )
-            .join('')}
+            .join("")}
         </tbody>
       </table>
       <script type="text/javascript">
@@ -171,15 +169,15 @@ export const exportData = (props) => {
     printWindow.document.close();
   }
 
-  if (type === 'csv') {
+  if (type === "csv") {
     function convertArrayOfObjectsToCSV(array) {
       let result;
 
-      const columnDelimiter = ',';
-      const lineDelimiter = '\n';
+      const columnDelimiter = ",";
+      const lineDelimiter = "\n";
       const keys = Object.keys(data[0]);
 
-      result = '';
+      result = "";
       result += capitalizeWords(keys).join(columnDelimiter);
       result += lineDelimiter;
 
@@ -207,17 +205,17 @@ export const exportData = (props) => {
     }
 
     function downloadCSV(array) {
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       let csv = convertArrayOfObjectsToCSV(array);
       if (csv == null) return;
 
       const currentDate = new Date()
-        .toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
+        .toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
         })
-        .replace(/\//g, '');
+        .replace(/\//g, "");
 
       const filename = `${title.props.children[1]}_${currentDate}.csv`;
 
@@ -225,8 +223,8 @@ export const exportData = (props) => {
         csv = `data:text/csv;charset=utf-8,${csv}`;
       }
 
-      link.setAttribute('href', encodeURI(csv));
-      link.setAttribute('download', filename);
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", filename);
       link.click();
     }
 

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import ModalNoForm from '../../ui-component/ModalNoForm';
+import { useState, useEffect } from "react";
+import ModalNoForm from "../../ui-component/ModalNoForm";
 import {
   Box,
   Button,
@@ -10,13 +10,15 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
+  Pagination,
   Radio,
   RadioGroup,
   Typography,
-} from '@mui/material';
-import { categories, foods } from '../../data/foodData';
-import { meals } from '../../data/mealData';
-import { toast } from 'react-toastify';
+} from "@mui/material";
+import { categories, foods } from "../../data/foodData";
+import { meals } from "../../data/mealData";
+import { toast } from "react-toastify";
+import Capsule from "../../ui-component/capsule/Capsule";
 
 export default function FoodMenu({
   cartItems,
@@ -30,8 +32,8 @@ export default function FoodMenu({
   const [modal, setModal] = useState(false);
   const [foodDetails, setFoodDetails] = useState();
   const [menuList, setMenuList] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('Burger');
-  const [type, setType] = useState('Meal');
+  const [activeCategory, setActiveCategory] = useState("Burger");
+  const [type, setType] = useState("Meal");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -55,6 +57,8 @@ export default function FoodMenu({
             quantity: 1,
             cost: food.cost,
             price: food.price,
+            option: food?.option || null,
+            inclusion: food?.inclusion || null,
           },
         ];
       }
@@ -65,7 +69,7 @@ export default function FoodMenu({
   useEffect(() => {
     calculate();
     setMenuList(
-      (type === 'Meal' ? meals : foodsList).filter(
+      (type === "Meal" ? meals : foodsList).filter(
         (obj) => obj.category === activeCategory
       )
     );
@@ -76,7 +80,7 @@ export default function FoodMenu({
   const filteredData = (
     searchQuery ? [...foodsList, ...meals] : menuList
   ).filter((item) => {
-    const foodValues = Object.values(item).join(' ').toLowerCase();
+    const foodValues = Object.values(item).join(" ").toLowerCase();
     return foodValues.includes(searchQuery.toLowerCase());
   });
 
@@ -95,16 +99,24 @@ export default function FoodMenu({
     <>
       {/* Category and Type selection */}
       {!searchQuery && (
-        <Grid container>
+        <Grid
+          container
+          p={3}
+          py={2}
+          mb={3}
+          sx={{ background: "#fff", borderRadius: 2 }}
+        >
           <Grid item xs={9}>
             <Typography mb={1} variant="h4">
               Category
             </Typography>
-            <Box p={3} pl={0} pt={0} display={'flex'}>
+            <Box display={"flex"}>
               {categories.map((category, index) => (
                 <Button
+                  className={`category-button
+                   ${activeCategory === category ? "active" : ""}`}
                   key={index}
-                  variant={activeCategory === category ? 'contained' : 'text'}
+                  variant={activeCategory === category ? "outlined" : "text"}
                   onClick={() => {
                     setActiveCategory(category);
                     setCurrentPage(1);
@@ -116,15 +128,15 @@ export default function FoodMenu({
             </Box>
           </Grid>
           <Grid item xs={3}>
-            <Box display={'flex'}>
+            <Box display={"flex"}>
               <FormControl>
                 <Typography mb={1} variant="h4">
                   Type
                 </Typography>
                 <RadioGroup
                   row
-                  id={'type'}
-                  name={'type'}
+                  id={"type"}
+                  name={"type"}
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                 >
@@ -161,7 +173,11 @@ export default function FoodMenu({
           return (
             <Grid item xs={2} key={index}>
               <Card
-                sx={{ maxWidth: 345, boxShadow: 1, height: '100%' }}
+                sx={{
+                  maxWidth: 345,
+                  boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
+                  height: "100%",
+                }}
                 onClick={() => {
                   if (foodStocks > 0) {
                     if (food.options) {
@@ -171,51 +187,54 @@ export default function FoodMenu({
                       addToCart(food);
                     }
                   } else {
-                    toast.error('Out of Stock', {
-                      position: 'top-left',
+                    toast.error("Out of Stock", {
+                      position: "top-left",
                       autoClose: true,
                       hideProgressBar: false,
                       closeOnClick: true,
                       draggable: false,
                       progress: undefined,
-                      theme: 'colored',
+                      theme: "colored",
                     });
                   }
                 }}
               >
-                <CardActionArea sx={{ height: '100%' }}>
+                <CardActionArea sx={{ height: "100%" }}>
                   {/* Display out of stock message */}
                   <Box
                     sx={{
-                      position: 'absolute',
-                      background: 'red',
-                      padding: '5px',
-                      color: 'white',
-                      borderRadius: '5px',
+                      position: "absolute",
+                      background: "red",
+                      padding: "5px",
+                      color: "white",
+                      borderRadius: "5px",
                     }}
-                    display={foodStocks > 0 ? 'none' : 'block'}
+                    display={foodStocks > 0 ? "none" : "block"}
                   >
                     Out of Stock
                   </Box>
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={food.img}
-                    alt="Food"
-                  />
+                  <Box padding={1}>
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={food.img}
+                      alt="Food"
+                    />
+                  </Box>
+
                   <CardContent>
                     {/* Food category and stocks */}
                     <Grid
                       item
                       xs={12}
-                      display={'flex'}
-                      justifyContent={'space-between'}
+                      display={"flex"}
+                      justifyContent={"space-between"}
                     >
                       <Typography gutterBottom variant="small" component="div">
-                        {food.category}
+                        <Capsule label={food.category} bgcolor={"blue"} />
                       </Typography>
                       <Typography gutterBottom variant="small" component="div">
-                        Stocks: {food.stocks}
+                        Stocks: {foodStocks}
                       </Typography>
                     </Grid>
 
@@ -246,14 +265,14 @@ export default function FoodMenu({
               <ModalNoForm
                 open={modal}
                 handleClose={() => setModal(false)}
-                title={'Choose Size'}
+                title={"Choose Size"}
               >
                 <Box
-                  width={'100%'}
-                  display={'flex'}
-                  justifyContent={'center'}
-                  alignItems={'center'}
-                  flexDirection={'column'}
+                  width={"100%"}
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  flexDirection={"column"}
                 >
                   {/* Food image and name */}
                   <CardMedia
@@ -274,9 +293,9 @@ export default function FoodMenu({
                       <Box
                         key={item}
                         my={1}
-                        width={'100%'}
-                        display={'flex'}
-                        justifyContent={'space-between'}
+                        width={"100%"}
+                        display={"flex"}
+                        justifyContent={"space-between"}
                       >
                         <Typography variant="h5">
                           {matchingItem.name}
@@ -298,9 +317,11 @@ export default function FoodMenu({
                           color="success"
                           onClick={() => {
                             addToCart({
-                              name: `${foodDetails.name} - ${option}`,
+                              name: foodDetails.name,
+                              option,
                               price: foodDetails.price[index],
                               cost: foodDetails.cost[index],
+                              inclusion: foodDetails?.inclusion,
                             });
                             setModal(false);
                             setFoodDetails();
