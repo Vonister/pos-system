@@ -4,7 +4,7 @@ import logo from "../../assets/images/logo.png";
 import { useState } from "react";
 import ModalNoForm from "../../ui-component/ModalNoForm";
 import Sidebar from "./Sidebar";
-import menuItems from "./menuItems";
+import menuItems from "./MenuItems";
 
 const Topbar = () => {
   const [settingsModal, setSettingsModal] = useState(false);

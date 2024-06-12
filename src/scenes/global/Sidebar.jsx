@@ -1,7 +1,6 @@
-import { useState } from "react";
-import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Menu, MenuItem, ProSidebar } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 
@@ -9,7 +8,7 @@ import logo from "../../assets/images/logo.png";
 
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 
-import menuItems from "./menuItems";
+import menuItems from "./MenuItems";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();

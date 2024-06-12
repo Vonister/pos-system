@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-import ModalNoForm from "../../ui-component/ModalNoForm";
 import {
   Box,
   Button,
@@ -15,10 +13,12 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { categories, foods } from "../../data/foodData";
-import { meals } from "../../data/mealData";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { categories } from "../../data/foodData";
+import { meals } from "../../data/mealData";
 import Capsule from "../../ui-component/capsule/Capsule";
+import ModalNoForm from "../../ui-component/ModalNoForm";
 
 export default function FoodMenu({
   cartItems,

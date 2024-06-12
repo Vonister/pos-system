@@ -30,6 +30,8 @@ const ModalNoForm = ({
       widthModal = "100%";
       height = "100%";
       break;
+    default:
+      break;
   }
   const style = {
     position: "absolute",
