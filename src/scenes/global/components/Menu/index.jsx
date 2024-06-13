@@ -1,18 +1,19 @@
-import { Box, Grid } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { fetchData } from '../../../../features/fetchData';
-import MenuForm from './MenuForm';
-import MenuTable from './MenuTable';
-import no_data from '../../../../assets/images/no_data.png';
+import { Box, Grid } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { fetchData } from "../../../../features/fetchData";
+import MenuForm from "./MenuForm";
+import MenuTable from "./MenuTable";
+import no_data from "../../../../assets/images/no_data.png";
 
 const Menu = () => {
   const [data, setData] = useState([]);
   const [categoriesOption, setCategoriesOption] = useState([]);
   const [isSoloMenu, setIsSoloMenu] = useState(true);
+  const [isLoadingTable, setIsLoadingTable] = useState(true);
 
   const fetchNeededData = () => {
-    const dbTable = isSoloMenu ? 'menu/foods' : 'menu/meals';
-    fetchData('categories').then((data) =>
+    const dbTable = isSoloMenu ? "menu/foods" : "menu/meals";
+    fetchData("categories").then((data) =>
       setCategoriesOption(data ? data : [])
     );
     fetchData(dbTable).then((data) => {
@@ -25,6 +26,7 @@ const Menu = () => {
       } else {
         setData([]);
       }
+      setIsLoadingTable(false);
     });
   };
 
@@ -47,18 +49,18 @@ const Menu = () => {
           />
         </Grid>
         <Grid item xs={8}>
-          {data.length === 0 ? (
+          {/* {data.length === 0 ? (
             <Box
-              width={'100%'}
-              display={'flex'}
-              justifyContent={'center'}
-              alignItems={'center'}
+              width={"100%"}
+              display={"flex"}
+              justifyContent={"center"}
+              alignItems={"center"}
             >
-              <img src={no_data} alt="" width={'80%'} />
+              <img src={no_data} alt="" width={"80%"} />
             </Box>
-          ) : (
-            <MenuTable data={data} />
-          )}
+          ) : ( */}
+          <MenuTable data={data} isLoadingTable={isLoadingTable} />
+          {/* // )} */}
         </Grid>
       </Grid>
     </>

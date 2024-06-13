@@ -1,6 +1,6 @@
 // material-ui
-import { Card, CardContent, Grid } from '@mui/material';
-import Skeleton from '@mui/material/Skeleton';
+import { Card, CardContent, Grid } from "@mui/material";
+import Skeleton from "@mui/material/Skeleton";
 
 // ==============================|| SKELETON - EARNING CARD ||============================== //
 
@@ -22,7 +22,7 @@ const RemainingCard = () => (
           <Skeleton variant="rectangular" sx={{ my: 2 }} height={40} />
         </Grid>
         <Grid item>
-          <Skeleton variant="rectangular" height={30} />
+          <Skeleton variant="rectangular" height={100} />
         </Grid>
       </Grid>
     </CardContent>
