@@ -1,4 +1,4 @@
-import CancelIcon from "@mui/icons-material/Cancel";
+import CancelIcon from '@mui/icons-material/Cancel';
 import {
   Alert,
   Box,
@@ -8,21 +8,27 @@ import {
   CardContent,
   CardHeader,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
+  Radio,
+  RadioGroup,
   TextField,
   Typography,
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import ModalNoForm from "../../ui-component/ModalNoForm";
+} from '@mui/material';
+import { useEffect, useState } from 'react';
+import ModalNoForm from '../../ui-component/ModalNoForm';
 import {
   StyledAccordion,
   StyledAccordionDetails,
   StyledAccordionSummary,
-} from "../../ui-component/StyledAccordion";
-import ModalWrapper from "../../ui-component/ModalWrapper";
-import { foods } from "../../data/foodData";
-import Swal from "sweetalert2";
+} from '../../ui-component/StyledAccordion';
+import ModalWrapper from '../../ui-component/ModalWrapper';
+import Swal from 'sweetalert2';
+import { saveData } from '../../features/saveData';
+import { updateData } from '../../features/updateData';
+import GetCurrentDate from '../../services/GetCurrentDate';
+import GenerateTransactionNumber from '../../services/GenerateTransactionNumber';
 
 export default function Cart(props) {
   // Destructuring props
@@ -34,16 +40,18 @@ export default function Cart(props) {
     setDiscount,
     calculate,
     payable,
-    setFoodsList,
     foodsList,
+    fetchNeededData,
   } = props;
 
   // State variables
-  const [expanded, setExpanded] = useState("");
+  const [expanded, setExpanded] = useState('');
   const [modal, setModal] = useState(false);
   const [proceedModal, setProceedModal] = useState(false);
   const [payment, setPayment] = useState(0);
   const [change, setChange] = useState(0);
+  const [isDine, setIsDine] = useState('Dine In');
+  const [transactionNumber, setTransactionNumber] = useState('');
 
   // Function to handle accordion panel changes
   const handleChange = (panel) => (event, newExpanded) => {
@@ -67,54 +75,84 @@ export default function Cart(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Create a new foodsList based on the current state
-    let updatedFoodsList = foodsList.map((food) => ({ ...food }));
+    var totalCosts = 0;
+    var totalPrices = 0;
+    var netProfit = 0;
+    var discountPercent = discount;
+    var discountAmount = subtotal - payable;
 
     // Iterate through cartItems and update stocks in the new foodsList
     cartItems.forEach((item) => {
-      if (item.inclusion) {
-        const filteredCartItems = updatedFoodsList.filter((list) =>
-          item.inclusion.includes(list.id)
+      //Decrease the stocks in the database
+      if (item.inclusions) {
+        const filteredCartItems = foodsList.filter((list) =>
+          item.inclusions.includes(list.id)
         );
         filteredCartItems.forEach((filterItem) => {
-          updatedFoodsList = updatedFoodsList.map((food) => {
-            return filterItem.id === food.id
-              ? {
-                  ...food,
+          foodsList.map((food) => {
+            if (filterItem.id === food.id) {
+              const { id, imageUrl, ...restofData } = food; // Exclude the `id` key and imageUrl before updating the data
+              updateData(
+                {
+                  ...restofData,
                   stocks: food.stocks - item.quantity,
-                }
-              : food;
+                },
+                `menu/foods/${food.id}`
+              );
+            }
           });
         });
-        // Update the state with the new foodsList
-        setFoodsList(updatedFoodsList);
       } else {
-        updatedFoodsList = updatedFoodsList.map((food) => {
-          return item.name === food.name
-            ? {
-                ...food,
+        foodsList.map((food) => {
+          if (item.id === food.id) {
+            const { id, imageUrl, ...restofData } = food; // Exclude the `id` key and imageUrl before updating the data
+            updateData(
+              {
+                ...restofData,
                 stocks: food.stocks - item.quantity,
-              }
-            : food;
+              },
+              `menu/foods/${food.id}`
+            );
+          }
         });
       }
+
+      totalCosts = totalCosts + Number(item.costs);
+      totalPrices = totalPrices + Number(item.prices);
     });
 
+    var netProfit =
+      Number(totalPrices) - (Number(totalCosts) + Number(discountAmount));
+
+    saveData(
+      {
+        totalCosts,
+        totalPrices,
+        netProfit,
+        discountPercent,
+        discountAmount,
+        date: GetCurrentDate(),
+        items: cartItems,
+        totalNumberItems: cartItems.length,
+        isDine,
+        transactionNumber,
+      },
+      'transactions'
+    );
+
     Swal.fire({
-      icon: "success",
+      icon: 'success',
       html: `<h3>Successful Transaction</h3>
       <h2>Change: PHP 100.00</h2>
       `,
     });
-
-    // Update the state with the new foodsList
-    setFoodsList(updatedFoodsList);
 
     //Return the state to initial state
     setProceedModal(false);
     setPayment(0);
     setChange(0);
     setCartItems([]);
+    fetchNeededData();
   };
 
   return (
@@ -135,7 +173,7 @@ export default function Cart(props) {
           />
 
           {/* Orders in the cart */}
-          <CardContent sx={{ py: 0, maxHeight: "450px", overflowY: "scroll" }}>
+          <CardContent sx={{ py: 0, maxHeight: '450px', overflowY: 'auto' }}>
             {cartItems.length > 0 ? (
               <>
                 {cartItems.map((cartData, index) => (
@@ -149,18 +187,18 @@ export default function Cart(props) {
                       id={`${index}d-header`}
                     >
                       <Typography
-                        display={"flex"}
-                        flexDirection={"column"}
+                        display={'flex'}
+                        flexDirection={'column'}
                         variant="h5"
                         color="text.secondary"
                       >
-                        {cartData.name} {cartData?.option}
-                        <Typography sx={{ fontWeight: "600", ml: 1 }}>
+                        {cartData.name} {cartData?.options}
+                        <Typography sx={{ fontWeight: '600', ml: 1 }}>
                           x {cartData.quantity}
                         </Typography>
                       </Typography>
-                      <Typography display={"flex"} alignItems={"center"}>
-                        PHP {(cartData.price * cartData.quantity).toFixed(2)}
+                      <Typography display={'flex'} alignItems={'center'}>
+                        PHP {(cartData.prices * cartData.quantity).toFixed(2)}
                         <IconButton
                           onClick={() => {
                             setCartItems(
@@ -168,12 +206,12 @@ export default function Cart(props) {
                             );
                             setExpanded(false);
                           }}
-                          sx={{ marginLeft: "5px" }}
+                          sx={{ marginLeft: '5px' }}
                         >
                           <CancelIcon
                             sx={{
-                              color: "#9f9f9e",
-                              fontSize: "18px",
+                              color: '#9f9f9e',
+                              fontSize: '18px',
                             }}
                           />
                         </IconButton>
@@ -215,7 +253,7 @@ export default function Cart(props) {
               <Alert
                 variant="filled"
                 severity="info"
-                sx={{ background: "whitesmoke", color: "#333" }}
+                sx={{ background: 'whitesmoke', color: '#333' }}
               >
                 There's no item in the cart
               </Alert>
@@ -224,21 +262,21 @@ export default function Cart(props) {
 
           {/* Total to pay and discount information */}
           <CardActions>
-            <Box display={"flex"} flexDirection={"column"} width={"100%"}>
-              <Box display={"flex"} justifyContent={"space-between"}>
+            <Box display={'flex'} flexDirection={'column'} width={'100%'}>
+              <Box display={'flex'} justifyContent={'space-between'}>
                 <Typography>Subtotal</Typography>
                 <Typography>PHP {subtotal.toFixed(2)}</Typography>
               </Box>
-              <Box display={"flex"} justifyContent={"space-between"}>
+              <Box display={'flex'} justifyContent={'space-between'}>
                 <Typography>Discount</Typography>
                 <Typography>{discount}%</Typography>
               </Box>
-              <Box display={"flex"} justifyContent={"space-between"} mt={2}>
+              <Box display={'flex'} justifyContent={'space-between'} mt={2}>
                 <Typography variant="h4">Payable Amount</Typography>
                 <Typography>PHP {payable.toFixed(2)}</Typography>
               </Box>
 
-              <Box display={"flex"} justifyContent={"space-between"} mt={2}>
+              <Box display={'flex'} justifyContent={'space-between'} mt={2}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -249,7 +287,10 @@ export default function Cart(props) {
                 <Button
                   variant="contained"
                   color="success"
-                  onClick={() => setProceedModal(true)}
+                  onClick={() => {
+                    setTransactionNumber(GenerateTransactionNumber());
+                    setProceedModal(true);
+                  }}
                   disabled={payable ? false : true}
                 >
                   Proceed
@@ -263,6 +304,40 @@ export default function Cart(props) {
               handleClose={() => setModal(false)}
               title="Add Discount"
             >
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography mb={1} variant="h4">
+                    Discount
+                  </Typography>
+                  <Box p={3} pl={0} pt={0} display={'flex'}>
+                    {/* Payment buttons */}
+                    {[5, 10, 20, 50].map((amount) => (
+                      <Button
+                        key={amount}
+                        sx={{ mx: 1 }}
+                        variant={'contained'}
+                        onClick={() => setDiscount(amount)}
+                      >
+                        {amount}%
+                      </Button>
+                    ))}
+                  </Box>
+                  <Box p={3} pl={0} pt={0} display={'flex'}>
+                    {/* Payment buttons */}
+                    {['PWD', 'Senior'].map((amount) => (
+                      <Button
+                        key={amount}
+                        sx={{ mx: 1 }}
+                        variant={'contained'}
+                        color="success"
+                        onClick={() => setDiscount(20)}
+                      >
+                        {amount}
+                      </Button>
+                    ))}
+                  </Box>
+                </Grid>
+              </Grid>
               <FormControl fullWidth>
                 <TextField
                   id="discount"
@@ -288,35 +363,48 @@ export default function Cart(props) {
               isButton={payment >= payable ? true : false}
             >
               {/* Payment form */}
-              <Box display={"flex"} flexDirection={"column"} width={"100%"}>
-                <Box display={"flex"} justifyContent={"space-between"}>
+              <Box
+                display={'flex'}
+                flexDirection={'column'}
+                width={'100%'}
+                sx={{ mb: 3 }}
+              >
+                <Box
+                  display={'flex'}
+                  justifyContent={'space-between'}
+                  sx={{ mb: 2 }}
+                >
+                  <Typography variant="h4">Transaction Number</Typography>
+                  <Typography variant="h4">{transactionNumber}</Typography>
+                </Box>
+                <Box display={'flex'} justifyContent={'space-between'}>
                   <Typography>Subtotal</Typography>
                   <Typography>PHP {subtotal.toFixed(2)}</Typography>
                 </Box>
-                <Box display={"flex"} justifyContent={"space-between"}>
+                <Box display={'flex'} justifyContent={'space-between'}>
                   <Typography>Discount</Typography>
                   <Typography>{discount}%</Typography>
                 </Box>
-                <Box display={"flex"} justifyContent={"space-between"}>
+                <Box display={'flex'} justifyContent={'space-between'}>
                   <Typography>Payable Amount</Typography>
                   <Typography variant="h4">PHP {payable.toFixed(2)}</Typography>
                 </Box>
               </Box>
 
               {/* Payment options */}
-              <Box display={"flex"} flexDirection={"column"} width={"100%"}>
+              <Box display={'flex'} flexDirection={'column'} width={'100%'}>
                 <Grid container>
                   <Grid item xs={12}>
                     <Typography mb={1} variant="h4">
                       Payment
                     </Typography>
-                    <Box p={3} pl={0} pt={0} display={"flex"}>
+                    <Box p={3} pl={0} pt={0} display={'flex'}>
                       {/* Payment buttons */}
                       {[20, 50, 100, 500, 1000].map((amount) => (
                         <Button
                           key={amount}
                           sx={{ mx: 1 }}
-                          variant={"outlined"}
+                          variant={'outlined'}
                           onClick={() => handlePayment(amount)}
                         >
                           +{amount}
@@ -330,7 +418,7 @@ export default function Cart(props) {
                     {/* Button for exact payment */}
                     <Button
                       sx={{ mx: 1 }}
-                      variant={"contained"}
+                      variant={'contained'}
                       onClick={() => {
                         setPayment(payable);
                         setChange(0);
@@ -348,7 +436,7 @@ export default function Cart(props) {
                         name="payment"
                         label="Payment"
                         variant="outlined"
-                        value={payment === 0 ? "" : payment}
+                        value={payment === 0 ? '' : payment}
                         onChange={(e) => {
                           setPayment(Number(e.target.value));
                           setChange(Number(e.target.value) - payable);
@@ -358,10 +446,32 @@ export default function Cart(props) {
                     </FormControl>
                   </Grid>
                 </Grid>
-                <Box display={"flex"} justifyContent={"space-between"} mt={2}>
+                <Box display={'flex'} justifyContent={'space-between'} mt={2}>
                   <Typography variant="h4">Change</Typography>
                   <Typography>PHP {change.toFixed(2)}</Typography>
                 </Box>
+              </Box>
+              <Box display={'flex'} justifyContent={'end'}>
+                <FormControl>
+                  <RadioGroup
+                    row
+                    id={'dine'}
+                    name={'dine'}
+                    value={isDine}
+                    onChange={(e) => setIsDine(e.target.value)}
+                  >
+                    <FormControlLabel
+                      value="Dine In"
+                      control={<Radio />}
+                      label="Dine In"
+                    />
+                    <FormControlLabel
+                      value="Take Out"
+                      control={<Radio />}
+                      label="Take Out"
+                    />
+                  </RadioGroup>
+                </FormControl>
               </Box>
             </ModalWrapper>
           </CardActions>

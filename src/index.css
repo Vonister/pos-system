@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap');
 
 html,
 body,
@@ -7,7 +7,7 @@ body,
 .content {
   height: 100%;
   width: 100%;
-  font-family: "Source Sans Pro", sans-serif;
+  font-family: 'Source Sans Pro', sans-serif;
   background: rgb(238, 242, 246);
 }
 
@@ -18,21 +18,21 @@ body,
 
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
-  background: #e0e0e0;
+  background: #f1f1f1;
+  margin: 20px;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: rgb(0, 153, 255);
+  border-radius: 10px;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: rgb(2, 111, 184);
 }
 
 .css-sox5kk-MuiBackdrop-root {
@@ -48,4 +48,9 @@ body,
   color: #2196f3 !important;
   border-radius: 10px !important;
   background: #7bebff3d !important;
+}
+
+.MuiAutocomplete-popper div {
+  background-color: #f1f1f1; /* Replace with your desired background color */
+  padding: 3px;
 }

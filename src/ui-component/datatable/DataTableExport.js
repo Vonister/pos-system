@@ -1,7 +1,7 @@
 export const exportData = (props) => {
   const { type, columns, data, title } = props;
-  if (type === "print") {
-    const printWindow = window.open("", "_blank");
+  if (type === 'print') {
+    const printWindow = window.open('', '_blank');
     printWindow.document.write(`
   <html>
     <head>
@@ -31,7 +31,7 @@ export const exportData = (props) => {
           font-weight: 500;
         }
 
-        .tneu{
+        .subtitle{
           font-family: 'Inter', sans-serif;
         }
 
@@ -120,12 +120,11 @@ export const exportData = (props) => {
        
         <div class="text-center">
           <h4 class="fw-bold">Republic of the Philippines</h4>
-          <h3 class="fw-bold">BATANGAS STATE UNIVERSITY</h3>
-          <h5 class="text-danger tneu">The National Engineering University</h5>
-          <h4>JPLPC-Malvar Campus</h4>
-          <p class="bold">G. Leviste Street, Poblacion, Malvar, Btangas, Philippines 4233</p>
-          <p>Tel Nos.: (+63 43)778-2170 local 502(+63 43)778-6633</p>
-          <p>E-mail Address: <span class="text-primary">ict.malvar@g.batstate-u.edu.ph</span> | Website: <span class="text-primary">http://www.batstate-u.edu.ph</span></p>
+          <h3 class="fw-bold">WcDonalds Philippines</h3>
+          <h5 class="text-danger subtitle">The Most Trusted Restaurant</h5>
+          <p class="bold">Tanauan City, Batangas, Philippines 4233</p>
+          <p>Tel Nos.: +123456789</p>
+          <p>E-mail Address: <span class="text-primary">wcdonalds@email.abc</span> | Website: <span class="text-primary">http://www.wcdonaldsmema.abc</span></p>
         </div>
       </div>
       <div class="print-title">
@@ -134,7 +133,7 @@ export const exportData = (props) => {
       <table class="print-table">
         <thead>
           <tr>
-            ${columns.map((column) => `<th>${column.name}</th>`).join("")}
+            ${columns.map((column) => `<th>${column.name}</th>`).join('')}
           </tr>
         </thead>
         <tbody>
@@ -143,12 +142,12 @@ export const exportData = (props) => {
               (row) => `
             <tr>
               ${columns
-                .map((column) => `<td>${column?.selector(row) || ""}</td>`)
-                .join("")}
+                .map((column) => `<td>${column?.selector(row) || ''}</td>`)
+                .join('')}
             </tr>
           `
             )
-            .join("")}
+            .join('')}
         </tbody>
       </table>
       <script type="text/javascript">
@@ -169,15 +168,15 @@ export const exportData = (props) => {
     printWindow.document.close();
   }
 
-  if (type === "csv") {
+  if (type === 'csv') {
     function convertArrayOfObjectsToCSV(array) {
       let result;
 
-      const columnDelimiter = ",";
-      const lineDelimiter = "\n";
+      const columnDelimiter = ',';
+      const lineDelimiter = '\n';
       const keys = Object.keys(data[0]);
 
-      result = "";
+      result = '';
       result += capitalizeWords(keys).join(columnDelimiter);
       result += lineDelimiter;
 
@@ -205,17 +204,17 @@ export const exportData = (props) => {
     }
 
     function downloadCSV(array) {
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       let csv = convertArrayOfObjectsToCSV(array);
       if (csv == null) return;
 
       const currentDate = new Date()
-        .toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
+        .toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
         })
-        .replace(/\//g, "");
+        .replace(/\//g, '');
 
       const filename = `${title.props.children[1]}_${currentDate}.csv`;
 
@@ -223,8 +222,8 @@ export const exportData = (props) => {
         csv = `data:text/csv;charset=utf-8,${csv}`;
       }
 
-      link.setAttribute("href", encodeURI(csv));
-      link.setAttribute("download", filename);
+      link.setAttribute('href', encodeURI(csv));
+      link.setAttribute('download', filename);
       link.click();
     }
 
