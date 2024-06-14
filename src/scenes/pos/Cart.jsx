@@ -1,4 +1,4 @@
-import CancelIcon from '@mui/icons-material/Cancel';
+import CancelIcon from "@mui/icons-material/Cancel";
 import {
   Alert,
   Box,
@@ -14,21 +14,25 @@ import {
   Radio,
   RadioGroup,
   TextField,
+  Tooltip,
   Typography,
-} from '@mui/material';
-import { useEffect, useState } from 'react';
-import ModalNoForm from '../../ui-component/ModalNoForm';
+  Zoom,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import ModalNoForm from "../../ui-component/ModalNoForm";
 import {
   StyledAccordion,
   StyledAccordionDetails,
   StyledAccordionSummary,
-} from '../../ui-component/StyledAccordion';
-import ModalWrapper from '../../ui-component/ModalWrapper';
-import Swal from 'sweetalert2';
-import { saveData } from '../../features/saveData';
-import { updateData } from '../../features/updateData';
-import GetCurrentDate from '../../services/GetCurrentDate';
-import GenerateTransactionNumber from '../../services/GenerateTransactionNumber';
+} from "../../ui-component/StyledAccordion";
+import ModalWrapper from "../../ui-component/ModalWrapper";
+import Swal from "sweetalert2";
+import { saveData } from "../../features/saveData";
+import { updateData } from "../../features/updateData";
+import GetCurrentDate from "../../services/GetCurrentDate";
+import GenerateTransactionNumber from "../../services/GenerateTransactionNumber";
+
+import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 
 export default function Cart(props) {
   // Destructuring props
@@ -46,14 +50,16 @@ export default function Cart(props) {
   } = props;
 
   // State variables
-  const [expanded, setExpanded] = useState('');
+  const [expanded, setExpanded] = useState("");
   const [modal, setModal] = useState(false);
   const [proceedModal, setProceedModal] = useState(false);
   const [payment, setPayment] = useState(0);
   const [change, setChange] = useState(0);
-  const [isDine, setIsDine] = useState('Dine In');
-  const [transactionNumber, setTransactionNumber] = useState('');
-  const [modeOfPayment, setModeOfPayment] = useState('Cash');
+  const [isDine, setIsDine] = useState("Dine In");
+  const [transactionNumber, setTransactionNumber] = useState("");
+  const [modeOfPayment, setModeOfPayment] = useState("Cash");
+  const [addCustomer, setAddCustomer] = useState(false);
+  const [customer, setCustomer] = useState([]);
 
   // Function to handle accordion panel changes
   const handleChange = (panel) => (event, newExpanded) => {
@@ -140,13 +146,14 @@ export default function Cart(props) {
         transactionNumber,
         modeOfPayment,
       },
-      'transactions'
+      "transactions"
     );
 
     Swal.fire({
-      icon: 'success',
+      icon: "success",
       html: `<h3>Successful Transaction</h3>
-      <h2>Change: PHP 100.00</h2>
+      <h2>Amount Charged: PHP ${totalPrices}</h2>
+    ${change !== 0 ? ` <h2>Change: PHP ${change}</h2>` : ``}
       `,
     });
 
@@ -170,13 +177,36 @@ export default function Cart(props) {
                 sx={{ fontWeight: 700 }}
                 component="div"
               >
-                Cart
+                Orders
               </Typography>
+            }
+            action={
+              <Tooltip TransitionComponent={Zoom} title="Add Customer" arrow>
+                <Button variant="contained">
+                  <PersonAddAltIcon />
+                </Button>
+              </Tooltip>
+            }
+            subheader={
+              <Box
+                display={"flex"}
+                backgroundColor={"#ebebeb"}
+                width={"100%"}
+                p={2}
+                m={2}
+                borderRadius={2}
+              >
+                <Typography variant="h4">Customer: </Typography>
+                {"  "}
+                <Typography mx={2} variant="h4" color={"primary"}>
+                  No Customer Name
+                </Typography>
+              </Box>
             }
           />
 
           {/* Orders in the cart */}
-          <CardContent sx={{ py: 0, maxHeight: '450px', overflowY: 'auto' }}>
+          <CardContent sx={{ py: 0, maxHeight: "450px", overflowY: "auto" }}>
             {cartItems.length > 0 ? (
               <>
                 {cartItems.map((cartData, index) => (
@@ -190,17 +220,17 @@ export default function Cart(props) {
                       id={`${index}d-header`}
                     >
                       <Typography
-                        display={'flex'}
-                        flexDirection={'column'}
+                        display={"flex"}
+                        flexDirection={"column"}
                         variant="h5"
                         color="text.secondary"
                       >
                         {cartData.name} {cartData?.options}
-                        <Typography sx={{ fontWeight: '600', ml: 1 }}>
+                        <Typography sx={{ fontWeight: "600", ml: 1 }}>
                           x {cartData.quantity}
                         </Typography>
                       </Typography>
-                      <Typography display={'flex'} alignItems={'center'}>
+                      <Typography display={"flex"} alignItems={"center"}>
                         PHP {(cartData.prices * cartData.quantity).toFixed(2)}
                         <IconButton
                           onClick={() => {
@@ -209,12 +239,12 @@ export default function Cart(props) {
                             );
                             setExpanded(false);
                           }}
-                          sx={{ marginLeft: '5px' }}
+                          sx={{ marginLeft: "5px" }}
                         >
                           <CancelIcon
                             sx={{
-                              color: '#9f9f9e',
-                              fontSize: '18px',
+                              color: "#9f9f9e",
+                              fontSize: "18px",
                             }}
                           />
                         </IconButton>
@@ -256,7 +286,7 @@ export default function Cart(props) {
               <Alert
                 variant="filled"
                 severity="info"
-                sx={{ background: 'whitesmoke', color: '#333' }}
+                sx={{ background: "whitesmoke", color: "#333" }}
               >
                 There's no item in the cart
               </Alert>
@@ -265,21 +295,21 @@ export default function Cart(props) {
 
           {/* Total to pay and discount information */}
           <CardActions>
-            <Box display={'flex'} flexDirection={'column'} width={'100%'}>
-              <Box display={'flex'} justifyContent={'space-between'}>
+            <Box display={"flex"} flexDirection={"column"} width={"100%"}>
+              <Box display={"flex"} justifyContent={"space-between"}>
                 <Typography>Subtotal</Typography>
                 <Typography>PHP {subtotal.toFixed(2)}</Typography>
               </Box>
-              <Box display={'flex'} justifyContent={'space-between'}>
+              <Box display={"flex"} justifyContent={"space-between"}>
                 <Typography>Discount</Typography>
                 <Typography>{discount}%</Typography>
               </Box>
-              <Box display={'flex'} justifyContent={'space-between'} mt={2}>
+              <Box display={"flex"} justifyContent={"space-between"} mt={2}>
                 <Typography variant="h4">Payable Amount</Typography>
                 <Typography>PHP {payable.toFixed(2)}</Typography>
               </Box>
 
-              <Box display={'flex'} justifyContent={'space-between'} mt={2}>
+              <Box display={"flex"} justifyContent={"space-between"} mt={2}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -312,26 +342,26 @@ export default function Cart(props) {
                   <Typography mb={1} variant="h4">
                     Discount
                   </Typography>
-                  <Box p={3} pl={0} pt={0} display={'flex'}>
+                  <Box p={3} pl={0} pt={0} display={"flex"}>
                     {/* Payment buttons */}
                     {[5, 10, 20, 50].map((amount) => (
                       <Button
                         key={amount}
                         sx={{ mx: 1 }}
-                        variant={'contained'}
+                        variant={"contained"}
                         onClick={() => setDiscount(amount)}
                       >
                         {amount}%
                       </Button>
                     ))}
                   </Box>
-                  <Box p={3} pl={0} pt={0} display={'flex'}>
+                  <Box p={3} pl={0} pt={0} display={"flex"}>
                     {/* Payment buttons */}
-                    {['PWD', 'Senior'].map((amount) => (
+                    {["PWD", "Senior"].map((amount) => (
                       <Button
                         key={amount}
                         sx={{ mx: 1 }}
-                        variant={'contained'}
+                        variant={"contained"}
                         color="success"
                         onClick={() => setDiscount(20)}
                       >
@@ -357,10 +387,10 @@ export default function Cart(props) {
                 />
               </FormControl>
 
-              <Box display={'flex'} justifyContent={'end'} pt={3}>
+              <Box display={"flex"} justifyContent={"end"} pt={3}>
                 <Button
                   sx={{ mx: 1 }}
-                  variant={'contained'}
+                  variant={"contained"}
                   onClick={() => {
                     setModal(false);
                   }}
@@ -380,47 +410,47 @@ export default function Cart(props) {
             >
               {/* Payment form */}
               <Box
-                display={'flex'}
-                flexDirection={'column'}
-                width={'100%'}
+                display={"flex"}
+                flexDirection={"column"}
+                width={"100%"}
                 sx={{ mb: 3 }}
               >
                 <Box
-                  display={'flex'}
-                  justifyContent={'space-between'}
+                  display={"flex"}
+                  justifyContent={"space-between"}
                   sx={{ mb: 2 }}
                 >
                   <Typography variant="h4">Transaction Number</Typography>
                   <Typography variant="h4">{transactionNumber}</Typography>
                 </Box>
-                <Box display={'flex'} justifyContent={'space-between'}>
+                <Box display={"flex"} justifyContent={"space-between"}>
                   <Typography>Subtotal</Typography>
                   <Typography>PHP {subtotal.toFixed(2)}</Typography>
                 </Box>
-                <Box display={'flex'} justifyContent={'space-between'}>
+                <Box display={"flex"} justifyContent={"space-between"}>
                   <Typography>Discount</Typography>
                   <Typography>{discount}%</Typography>
                 </Box>
-                <Box display={'flex'} justifyContent={'space-between'}>
+                <Box display={"flex"} justifyContent={"space-between"}>
                   <Typography>Payable Amount</Typography>
                   <Typography variant="h4">PHP {payable.toFixed(2)}</Typography>
                 </Box>
               </Box>
 
               {/* Payment options */}
-              <Box display={'flex'} flexDirection={'column'} width={'100%'}>
+              <Box display={"flex"} flexDirection={"column"} width={"100%"}>
                 <Grid container>
                   <Grid item xs={12}>
                     <Typography mb={1} variant="h4">
                       Payment
                     </Typography>
-                    <Box p={3} pl={0} pt={0} display={'flex'}>
+                    <Box p={3} pl={0} pt={0} display={"flex"}>
                       {/* Payment buttons */}
                       {[20, 50, 100, 500, 1000].map((amount) => (
                         <Button
                           key={amount}
                           sx={{ mx: 1 }}
-                          variant={'outlined'}
+                          variant={"outlined"}
                           onClick={() => handlePayment(amount)}
                         >
                           +{amount}
@@ -434,7 +464,7 @@ export default function Cart(props) {
                     {/* Button for exact payment */}
                     <Button
                       sx={{ mx: 1 }}
-                      variant={'contained'}
+                      variant={"contained"}
                       onClick={() => {
                         setPayment(payable);
                         setChange(0);
@@ -452,7 +482,7 @@ export default function Cart(props) {
                         name="payment"
                         label="Payment"
                         variant="outlined"
-                        value={payment === 0 ? '' : payment}
+                        value={payment === 0 ? "" : payment}
                         onChange={(e) => {
                           setPayment(Number(e.target.value));
                           setChange(Number(e.target.value) - payable);
@@ -462,17 +492,17 @@ export default function Cart(props) {
                     </FormControl>
                   </Grid>
                 </Grid>
-                <Box display={'flex'} justifyContent={'space-between'} mt={2}>
+                <Box display={"flex"} justifyContent={"space-between"} mt={2}>
                   <Typography variant="h4">Change</Typography>
                   <Typography>PHP {change.toFixed(2)}</Typography>
                 </Box>
               </Box>
-              <Box display={'flex'} justifyContent={'end'}>
+              <Box display={"flex"} justifyContent={"end"}>
                 <FormControl>
                   <RadioGroup
                     row
-                    id={'dine'}
-                    name={'dine'}
+                    id={"dine"}
+                    name={"dine"}
                     value={isDine}
                     onChange={(e) => setIsDine(e.target.value)}
                   >
@@ -490,12 +520,12 @@ export default function Cart(props) {
                 </FormControl>
               </Box>
               <Typography variant="h4">Mode of Payment</Typography>
-              <Box display={'flex'} justifyContent={'start'}>
+              <Box display={"flex"} justifyContent={"start"}>
                 <FormControl>
                   <RadioGroup
                     row
-                    id={'modeOfPayment'}
-                    name={'modeOfPayment'}
+                    id={"modeOfPayment"}
+                    name={"modeOfPayment"}
                     value={modeOfPayment}
                     onChange={(e) => setModeOfPayment(e.target.value)}
                   >

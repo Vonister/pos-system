@@ -1,12 +1,12 @@
-import SearchIcon from '@mui/icons-material/Search';
-import { Box, Grid, IconButton, InputBase } from '@mui/material';
-import Header from '../../ui-component/Header';
-import MainCard from '../../ui-component/cards/MainCard';
-import Cart from './Cart';
-import FoodMenu from './FoodMenu';
-import { useEffect, useState } from 'react';
-import { foods } from '../../data/foodData';
-import { fetchData } from '../../features/fetchData';
+import SearchIcon from "@mui/icons-material/Search";
+import { Box, Grid, IconButton, InputBase } from "@mui/material";
+import Header from "../../ui-component/Header";
+import MainCard from "../../ui-component/cards/MainCard";
+import Cart from "./Cart";
+import FoodMenu from "./FoodMenu";
+import { useEffect, useState } from "react";
+import { foods } from "../../data/foodData";
+import { fetchData } from "../../features/fetchData";
 
 const Pos = () => {
   // State variables to manage cart items, subtotal, discount, payable amount, search query, and the list of foods.
@@ -36,7 +36,7 @@ const Pos = () => {
   };
 
   const fetchNeededData = () => {
-    fetchData('categories').then((data) => {
+    fetchData("categories").then((data) => {
       if (data) {
         // Sort the data by category
         const sortedData = data.sort((a, b) =>
@@ -47,37 +47,41 @@ const Pos = () => {
         setCategories([]);
       }
     });
-    fetchData('menu/foods').then((data) => {
+    fetchData("menu/foods").then((data) => {
       if (data) {
         // Sort the data by category
         const sortedData = data.sort((a, b) =>
           a.category.localeCompare(b.category)
         );
+
         setFoodsList(sortedData);
+        setIsLoading(false);
       } else {
+        setIsLoading(false);
         setFoodsList([]);
       }
-      setIsLoading(false);
     });
-    fetchData('menu/meals').then((data) => {
+    fetchData("menu/meals").then((data) => {
       if (data) {
         // Sort the data by category
         const sortedData = data.sort((a, b) =>
           a.category.localeCompare(b.category)
         );
         setMealsList(sortedData);
+        setIsLoading(false);
       } else {
+        setIsLoading(false);
         setMealsList([]);
       }
-      setIsLoading(false);
     });
-    fetchData('settings').then((data) => {
+    fetchData("settings").then((data) => {
       if (data) {
+        setIsLoading(false);
         setAvailableModes(data);
       } else {
+        setIsLoading(false);
         setAvailableModes([]);
       }
-      setIsLoading(false);
     });
   };
 
