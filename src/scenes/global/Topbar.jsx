@@ -10,6 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 const Topbar = () => {
   const [settingsModal, setSettingsModal] = useState(false);
   const [selected, setSelected] = useState('Menu Management');
+  const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <Box
       display="flex"
@@ -34,13 +35,29 @@ const Topbar = () => {
         handleClose={() => setSettingsModal(false)}
         size="modal-fullscreen"
         title="Settings"
-        sx={{ p: '0 !important' }}
+        sx={{ p: '0 !important', background: 'rgb(238, 242, 246)' }}
       >
-        <Box display={'flex'} sx={{ background: 'rgb(238, 242, 246)' }}>
-          <Sidebar selected={selected} setSelected={setSelected} />
+        <Box
+          display={'flex'}
+          sx={{ background: 'rgb(238, 242, 246)', height: '100%' }}
+        >
+          <Sidebar
+            selected={selected}
+            setSelected={setSelected}
+            isCollapsed={isCollapsed}
+            setIsCollapsed={setIsCollapsed}
+          />
           {menuItems.items.map((item, idx) => {
             return item.title === selected ? (
-              <Box key={idx} sx={{ width: '100%', p: 4 }}>
+              <Box
+                key={idx}
+                sx={{
+                  marginLeft: isCollapsed ? '80px' : '270px',
+                  width: '100%',
+                  p: 4,
+                  transition: 'all 0.3s ease',
+                }}
+              >
                 {item.component}
               </Box>
             ) : (

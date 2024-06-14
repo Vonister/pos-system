@@ -1,10 +1,10 @@
 // material-ui
-import { Card, CardContent, Grid } from "@mui/material";
-import Skeleton from "@mui/material/Skeleton";
+import { Card, CardContent, Grid } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 
 // ==============================|| SKELETON - EARNING CARD ||============================== //
 
-const RemainingCard = () => (
+const ItemCard = () => (
   <Card>
     <CardContent>
       <Grid container direction="column">
@@ -29,4 +29,4 @@ const RemainingCard = () => (
   </Card>
 );
 
-export default RemainingCard;
+export default ItemCard;

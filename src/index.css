@@ -54,3 +54,23 @@ body,
   background-color: #f1f1f1; /* Replace with your desired background color */
   padding: 3px;
 }
+
+/* // ==============================|| SWEET ALERT CUSTOM ||============================== // */
+
+.my-swal-container {
+  z-index: 1600 !important; /* Adjust the z-index value as needed */
+  backdrop-filter: blur(2px) !important; /* Adjust the blur value as needed */
+  background-color: rgb(14 14 14 / 61%) !important;
+}
+
+.my-swal-popup {
+  padding: 1rem;
+}
+
+.swal2-title {
+  line-height: 1.2;
+}
+
+.swal2-styled.swal2-confirm {
+  background-color: #2196f3;
+}

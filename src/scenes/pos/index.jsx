@@ -17,6 +17,8 @@ const Pos = () => {
   const [foodsList, setFoodsList] = useState([]);
   const [mealsList, setMealsList] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [availableModes, setAvailableModes] = useState([]);
 
   // Function to calculate subtotal and payable amount based on cart items and discount.
   const calculate = () => {
@@ -55,6 +57,7 @@ const Pos = () => {
       } else {
         setFoodsList([]);
       }
+      setIsLoading(false);
     });
     fetchData('menu/meals').then((data) => {
       if (data) {
@@ -66,10 +69,20 @@ const Pos = () => {
       } else {
         setMealsList([]);
       }
+      setIsLoading(false);
+    });
+    fetchData('settings').then((data) => {
+      if (data) {
+        setAvailableModes(data);
+      } else {
+        setAvailableModes([]);
+      }
+      setIsLoading(false);
     });
   };
 
   useEffect(() => {
+    setIsLoading(true);
     fetchNeededData();
   }, []);
 
@@ -87,6 +100,7 @@ const Pos = () => {
             categories={categories}
             mealsList={mealsList}
             fetchNeededData={fetchNeededData}
+            isLoading={isLoading}
           />
         </Grid>
 
@@ -102,6 +116,7 @@ const Pos = () => {
             calculate={calculate}
             foodsList={foodsList}
             fetchNeededData={fetchNeededData}
+            availableModes={availableModes}
           />
         </Grid>
       </Grid>

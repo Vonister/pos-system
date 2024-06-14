@@ -31,6 +31,9 @@ const MenuForm = ({
   fetchNeededData,
   isSoloMenu,
   setIsSoloMenu,
+  isLoadingTable,
+  setIsLoadingTable,
+  inclusionOptions,
 }) => {
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -46,7 +49,7 @@ const MenuForm = ({
     image: null,
   });
   const [isOption, setIsOption] = useState(false);
-  const [inclusionOptions, setInclusionOptions] = useState([]);
+
   const [optionCount, setOptionCount] = useState(1);
   const fileInputRef = useRef(null);
 
@@ -123,22 +126,8 @@ const MenuForm = ({
       fileInputRef.current.value = '';
     }
     setIsOption(false);
-    setOptionCount(0);
+    setOptionCount(1);
   };
-
-  useEffect(() => {
-    fetchData('menu/foods').then((data) => {
-      if (data) {
-        // Sort the data by category
-        const sortedData = data.sort((a, b) =>
-          a.category.localeCompare(b.category)
-        );
-        setInclusionOptions(sortedData);
-      } else {
-        setInclusionOptions([]);
-      }
-    });
-  }, []);
 
   return (
     <MainCard>
@@ -150,7 +139,10 @@ const MenuForm = ({
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography>Meal</Typography>
             <AntSwitch
-              onClick={() => setIsSoloMenu(!isSoloMenu)}
+              onClick={() => {
+                setIsSoloMenu(!isSoloMenu);
+                setIsLoadingTable(!isLoadingTable);
+              }}
               checked={isSoloMenu}
               inputProps={{ 'aria-label': 'ant design' }}
             />
@@ -249,8 +241,8 @@ const MenuForm = ({
                     }}
                     onChange={handleSelection}
                     value={inclusionOptions.filter((option) =>
-                      selectedInclusions.some((filter) =>
-                        filter.name.includes(option.name)
+                      selectedInclusions.some(
+                        (filter) => filter.name === option.name
                       )
                     )}
                   />

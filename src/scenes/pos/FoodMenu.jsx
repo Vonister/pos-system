@@ -26,6 +26,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import no_food from '../../assets/images/no_food.jpg';
 
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import DataTableSkeleton from '../../ui-component/cards/Skeleton/DataTableSkeleton';
+import POSSkeleton from '../../ui-component/cards/Skeleton/POSSkeleton';
 
 export default function FoodMenu({
   cartItems,
@@ -36,6 +38,7 @@ export default function FoodMenu({
   categories,
   mealsList,
   fetchNeededData,
+  isLoading,
 }) {
   // State variables
   const [modal, setModal] = useState(false);
@@ -72,6 +75,7 @@ export default function FoodMenu({
             prices: food.prices,
             options: food?.options || null,
             inclusions: food?.inclusions || null,
+            category: food.category,
           },
         ];
       }
@@ -221,232 +225,250 @@ export default function FoodMenu({
         )}
       </Grid>
 
-      {/* Food menu */}
-      {currentData.length > 0 ? (
-        <Grid container spacing={3}>
-          {currentData.map((food, index) => {
-            let foodStocks = food.stocks;
+      {isLoading ? (
+        <POSSkeleton />
+      ) : (
+        <>
+          {/* Food menu */}
+          {currentData.length > 0 ? (
+            <>
+              <Grid container spacing={3}>
+                {currentData.map((food, index) => {
+                  let foodStocks = food.stocks;
 
-            // Adjust stocks if inclusion is defined
-            if (food.inclusions) {
-              const stocks = foodsList
-                .filter((list) => food.inclusions.includes(list.id))
-                .map((stock) => stock.stocks);
-              foodStocks = Math.min(...stocks);
-            }
+                  // Adjust stocks if inclusion is defined
+                  if (food.inclusions) {
+                    const stocks = foodsList
+                      .filter((list) => food.inclusions.includes(list.id))
+                      .map((stock) => stock.stocks);
+                    foodStocks = Math.min(...stocks);
+                  }
 
-            return (
-              <Grid item xl={2} lg={3} md={4} xs={6} key={index}>
-                <Card
-                  sx={{
-                    maxWidth: 345,
-                    boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px;',
-                    height: '100%',
-                  }}
-                  onClick={() => {
-                    if (foodStocks > 0) {
-                      if (food.options) {
-                        setModal(true);
-                        setFoodDetails({ ...food });
-                      } else {
-                        addToCart(food);
-                      }
-                    } else {
-                      toast.error('Out of Stock', {
-                        position: 'top-left',
-                        autoClose: true,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        draggable: false,
-                        progress: undefined,
-                        theme: 'colored',
-                      });
-                    }
-                  }}
-                >
-                  <CardActionArea sx={{ height: '100%' }}>
-                    {/* Display out of stock message */}
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        background: 'red',
-                        padding: '5px',
-                        color: 'white',
-                        borderRadius: '5px',
-                      }}
-                      display={foodStocks > 0 ? 'none' : 'block'}
-                    >
-                      Out of Stock
-                    </Box>
-                    <Box padding={1}>
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={food.imageUrl}
-                        alt="Food"
-                      />
-                    </Box>
-
-                    <CardContent>
-                      {/* Food category and stocks */}
-                      <Grid
-                        item
-                        xs={12}
-                        display={'flex'}
-                        justifyContent={'space-between'}
+                  return (
+                    <Grid item xl={2} lg={3} md={4} xs={6} key={index}>
+                      <Card
+                        sx={{
+                          maxWidth: 345,
+                          boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px;',
+                          height: '100%',
+                        }}
+                        onClick={() => {
+                          if (foodStocks > 0) {
+                            if (food.options) {
+                              setModal(true);
+                              setFoodDetails({ ...food });
+                            } else {
+                              addToCart(food);
+                            }
+                          } else {
+                            toast.error('Out of Stock', {
+                              position: 'top-left',
+                              autoClose: true,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              draggable: false,
+                              progress: undefined,
+                              theme: 'colored',
+                            });
+                          }
+                        }}
                       >
-                        <Typography
-                          gutterBottom
-                          variant="small"
-                          component="div"
-                        >
-                          <Capsule label={food.category} bgcolor={'blue'} />
-                        </Typography>
-                        <Typography
-                          gutterBottom
-                          variant="small"
-                          component="div"
-                        >
-                          Stocks: {foodStocks}
-                        </Typography>
-                      </Grid>
+                        <CardActionArea sx={{ height: '100%' }}>
+                          {/* Display out of stock message */}
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              background: 'red',
+                              padding: '5px',
+                              color: 'white',
+                              borderRadius: '5px',
+                            }}
+                            display={foodStocks > 0 ? 'none' : 'block'}
+                          >
+                            Out of Stock
+                          </Box>
+                          <Box padding={1}>
+                            <CardMedia
+                              component="img"
+                              height="140"
+                              image={food.imageUrl}
+                              alt="Food"
+                            />
+                          </Box>
 
-                      {/* Food price or options */}
-                      {food?.options ? (
-                        <Typography
-                          gutterBottom
-                          variant="small"
-                          component="div"
-                        >
-                          {food?.options.map((option, index) => (
-                            <div key={index}>
-                              {option} : PHP {food.prices[index]}
-                            </div>
-                          ))}
-                        </Typography>
-                      ) : (
-                        <Typography
-                          gutterBottom
-                          variant="small"
-                          component="div"
-                        >
-                          PHP {food.prices}
-                        </Typography>
-                      )}
+                          <CardContent>
+                            {/* Food category and stocks */}
+                            <Grid
+                              item
+                              xs={12}
+                              display={'flex'}
+                              justifyContent={'space-between'}
+                            >
+                              <Typography
+                                gutterBottom
+                                variant="small"
+                                component="div"
+                              >
+                                <Capsule
+                                  label={food.category}
+                                  bgcolor={'blue'}
+                                />
+                              </Typography>
+                              <Typography
+                                gutterBottom
+                                variant="small"
+                                component="div"
+                              >
+                                Stocks: {foodStocks}
+                              </Typography>
+                            </Grid>
 
-                      {/* Food name */}
-                      <Typography gutterBottom variant="h4" component="div">
-                        {food.name}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
+                            {/* Food price or options */}
+                            {food?.options ? (
+                              <Typography
+                                gutterBottom
+                                variant="small"
+                                component="div"
+                              >
+                                {food?.options.map((option, index) => (
+                                  <div key={index}>
+                                    {option} : PHP {food.prices[index]}
+                                  </div>
+                                ))}
+                              </Typography>
+                            ) : (
+                              <Typography
+                                gutterBottom
+                                variant="small"
+                                component="div"
+                              >
+                                PHP {food.prices}
+                              </Typography>
+                            )}
 
-                {/* Modal for selecting options */}
-                <ModalNoForm
-                  open={modal}
-                  handleClose={() => setModal(false)}
-                  title={'Choose Size'}
-                >
-                  <Box
-                    width={'100%'}
-                    display={'flex'}
-                    justifyContent={'center'}
-                    alignItems={'center'}
-                    flexDirection={'column'}
-                  >
-                    {/* Food image and name */}
-                    <CardMedia
-                      component="img"
-                      width="100%"
-                      image={foodDetails?.imageUrl}
-                      alt="Food"
-                    />
-                    <Typography variant="h3">{foodDetails?.name}</Typography>
+                            {/* Food name */}
+                            <Typography
+                              gutterBottom
+                              variant="h4"
+                              component="div"
+                            >
+                              {food.name}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
 
-                    {/* Display included items */}
-                    {foodDetails?.inclusions?.map((item) => {
-                      const matchingItem = foodsList.find(
-                        (list) => list.id === item
-                      );
-
-                      return matchingItem ? (
+                      {/* Modal for selecting options */}
+                      <ModalNoForm
+                        open={modal}
+                        handleClose={() => setModal(false)}
+                        title={'Choose Size'}
+                      >
                         <Box
-                          key={item}
-                          my={1}
                           width={'100%'}
                           display={'flex'}
-                          justifyContent={'space-between'}
+                          justifyContent={'center'}
+                          alignItems={'center'}
+                          flexDirection={'column'}
                         >
-                          <Typography variant="h5">
-                            {matchingItem.name}
+                          {/* Food image and name */}
+                          <CardMedia
+                            component="img"
+                            width="100%"
+                            image={foodDetails?.imageUrl}
+                            alt="Food"
+                          />
+                          <Typography variant="h3">
+                            {foodDetails?.name}
                           </Typography>
-                          <Typography variant="h5">
-                            Stocks: {matchingItem.stocks}
-                          </Typography>
+
+                          {/* Display included items */}
+                          {foodDetails?.inclusions?.map((item) => {
+                            const matchingItem = foodsList.find(
+                              (list) => list.id === item
+                            );
+
+                            return matchingItem ? (
+                              <Box
+                                key={item}
+                                my={1}
+                                width={'100%'}
+                                display={'flex'}
+                                justifyContent={'space-between'}
+                              >
+                                <Typography variant="h5">
+                                  {matchingItem.name}
+                                </Typography>
+                                <Typography variant="h5">
+                                  Stocks: {matchingItem.stocks}
+                                </Typography>
+                              </Box>
+                            ) : null;
+                          })}
+
+                          {/* Buttons for selecting options */}
+                          <Grid container spacing={2}>
+                            {foodDetails?.options.map((option, index) => (
+                              <Grid item xs={4} key={index}>
+                                <Button
+                                  sx={{ mx: 1 }}
+                                  variant="contained"
+                                  color="success"
+                                  onClick={() => {
+                                    addToCart({
+                                      id: foodDetails.id,
+                                      name: foodDetails.name,
+                                      options: option,
+                                      prices: foodDetails.prices[index],
+                                      costs: foodDetails.costs[index],
+                                      inclusions: foodDetails?.inclusions,
+                                      category: food.category,
+                                    });
+                                    setModal(false);
+                                    setFoodDetails();
+                                  }}
+                                >
+                                  {option} <br /> PHP{' '}
+                                  {foodDetails.prices[index]}
+                                </Button>
+                              </Grid>
+                            ))}
+                          </Grid>
                         </Box>
-                      ) : null;
-                    })}
-
-                    {/* Buttons for selecting options */}
-                    <Grid container spacing={2}>
-                      {foodDetails?.options.map((option, index) => (
-                        <Grid item xs={4} key={index}>
-                          <Button
-                            sx={{ mx: 1 }}
-                            variant="contained"
-                            color="success"
-                            onClick={() => {
-                              addToCart({
-                                id: foodDetails.id,
-                                name: foodDetails.name,
-                                options: option,
-                                prices: foodDetails.prices[index],
-                                costs: foodDetails.costs[index],
-                                inclusions: foodDetails?.inclusions,
-                              });
-                              setModal(false);
-                              setFoodDetails();
-                            }}
-                          >
-                            {option} <br /> PHP {foodDetails.prices[index]}
-                          </Button>
-                        </Grid>
-                      ))}
+                      </ModalNoForm>
                     </Grid>
-                  </Box>
-                </ModalNoForm>
+                  );
+                })}
               </Grid>
-            );
-          })}
-        </Grid>
-      ) : (
-        <Box
-          width={'100%'}
-          display={'flex'}
-          justifyContent={'center'}
-          alignItems={'center'}
-        >
-          <img src={no_food} alt="" width={'80%'} />
-        </Box>
-      )}
-
-      {/* Pagination */}
-      <Grid item xs={12}>
-        <Box display="flex" justifyContent="center" mt={3}>
-          {totalPages > 1 && (
-            <Box>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                color="primary"
-                shape="circular"
-                onChange={handlePageChange}
-              />
+              {/* Pagination */}
+              <Grid item xs={12}>
+                <Box display="flex" justifyContent="center" mt={3}>
+                  {totalPages > 1 && (
+                    <Box>
+                      <Pagination
+                        count={totalPages}
+                        page={currentPage}
+                        color="primary"
+                        shape="circular"
+                        onChange={handlePageChange}
+                      />
+                    </Box>
+                  )}
+                </Box>
+              </Grid>
+            </>
+          ) : (
+            <Box
+              width={'100%'}
+              display={'flex'}
+              justifyContent={'center'}
+              alignItems={'center'}
+            >
+              <img src={no_food} alt="" width={'80%'} />
             </Box>
           )}
-        </Box>
-      </Grid>
+        </>
+      )}
     </>
   );
 }

@@ -8,6 +8,7 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import ModeOfPayment from './components/ModeOfPayment';
+import Reports from './components/Reports';
 
 const menuItems = {
   items: [
@@ -45,7 +46,7 @@ const menuItems = {
       to: '/',
       icon: <TimelineIcon />,
       category: 'item',
-      component: <Menu />,
+      component: <Reports />,
     },
     {
       title: 'History',

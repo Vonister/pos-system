@@ -42,6 +42,7 @@ export default function Cart(props) {
     payable,
     foodsList,
     fetchNeededData,
+    availableModes,
   } = props;
 
   // State variables
@@ -52,6 +53,7 @@ export default function Cart(props) {
   const [change, setChange] = useState(0);
   const [isDine, setIsDine] = useState('Dine In');
   const [transactionNumber, setTransactionNumber] = useState('');
+  const [modeOfPayment, setModeOfPayment] = useState('Cash');
 
   // Function to handle accordion panel changes
   const handleChange = (panel) => (event, newExpanded) => {
@@ -136,6 +138,7 @@ export default function Cart(props) {
         totalNumberItems: cartItems.length,
         isDine,
         transactionNumber,
+        modeOfPayment,
       },
       'transactions'
     );
@@ -341,17 +344,30 @@ export default function Cart(props) {
               <FormControl fullWidth>
                 <TextField
                   id="discount"
-                  type="search"
+                  type="number"
+                  inputProps={{ min: 0 }}
                   name="discount"
                   value={discount}
                   onChange={(e) => {
-                    setDiscount(e.target.value);
+                    setDiscount(e.target.value ? e.target.value : 0);
                   }}
                   label="Discount"
                   variant="outlined"
                   required
                 />
               </FormControl>
+
+              <Box display={'flex'} justifyContent={'end'} pt={3}>
+                <Button
+                  sx={{ mx: 1 }}
+                  variant={'contained'}
+                  onClick={() => {
+                    setModal(false);
+                  }}
+                >
+                  Confirm
+                </Button>
+              </Box>
             </ModalNoForm>
 
             {/* Modal for payment */}
@@ -470,6 +486,34 @@ export default function Cart(props) {
                       control={<Radio />}
                       label="Take Out"
                     />
+                  </RadioGroup>
+                </FormControl>
+              </Box>
+              <Typography variant="h4">Mode of Payment</Typography>
+              <Box display={'flex'} justifyContent={'start'}>
+                <FormControl>
+                  <RadioGroup
+                    row
+                    id={'modeOfPayment'}
+                    name={'modeOfPayment'}
+                    value={modeOfPayment}
+                    onChange={(e) => setModeOfPayment(e.target.value)}
+                  >
+                    <FormControlLabel
+                      value="Cash"
+                      control={<Radio />}
+                      label="Cash"
+                    />
+                    {availableModes[0]?.modes.map((mode) => {
+                      return (
+                        <FormControlLabel
+                          key={mode}
+                          value={mode}
+                          control={<Radio />}
+                          label={mode}
+                        />
+                      );
+                    })}
                   </RadioGroup>
                 </FormControl>
               </Box>

@@ -10,11 +10,11 @@ const colors = {
   primary800: '#1565c0',
 
   // secondary
-  secondaryLight: '#fcd9e0',
-  secondaryMain: '#df5257',
-  secondaryDark: '#ec1e22',
-  secondary200: '#e39ca8',
-  secondary800: '#d00d11',
+  secondaryLight: '#ede7f6',
+  secondaryMain: '#673ab7',
+  secondaryDark: '#5e35b1',
+  secondary200: '#b39ddb',
+  secondary800: '#4527a0',
 
   // success Colors
   successLight: '#b9f6ca',
