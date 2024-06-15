@@ -16,18 +16,20 @@ import {
   Tooltip,
   Typography,
   Zoom,
-} from '@mui/material';
-import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import Capsule from '../../ui-component/capsule/Capsule';
-import ModalNoForm from '../../ui-component/ModalNoForm';
-import SearchIcon from '@mui/icons-material/Search';
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import Capsule from "../../ui-component/capsule/Capsule";
+import ModalNoForm from "../../ui-component/ModalNoForm";
+import SearchIcon from "@mui/icons-material/Search";
 
-import no_food from '../../assets/images/no_food.jpg';
+import no_food from "../../assets/images/no_food.jpg";
 
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import DataTableSkeleton from '../../ui-component/cards/Skeleton/DataTableSkeleton';
-import POSSkeleton from '../../ui-component/cards/Skeleton/POSSkeleton';
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import DataTableSkeleton from "../../ui-component/cards/Skeleton/DataTableSkeleton";
+import POSSkeleton from "../../ui-component/cards/Skeleton/POSSkeleton";
+
+import nofoodimage from "../../assets/images/nofoodimage.png";
 
 export default function FoodMenu({
   cartItems,
@@ -44,10 +46,10 @@ export default function FoodMenu({
   const [modal, setModal] = useState(false);
   const [foodDetails, setFoodDetails] = useState();
   const [menuList, setMenuList] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('Burger');
-  const [type, setType] = useState('Meal');
+  const [activeCategory, setActiveCategory] = useState("Burger");
+  const [type, setType] = useState("Meal");
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 20;
 
   // Function to add an item to the cart
@@ -86,7 +88,7 @@ export default function FoodMenu({
   useEffect(() => {
     calculate();
     setMenuList(
-      (type === 'Meal' ? mealsList : foodsList).filter(
+      (type === "Meal" ? mealsList : foodsList).filter(
         (obj) => obj.category === activeCategory
       )
     );
@@ -97,7 +99,7 @@ export default function FoodMenu({
   const filteredData = (
     searchQuery ? [...foodsList, ...mealsList] : menuList
   ).filter((item) => {
-    const foodValues = Object.values(item).join(' ').toLowerCase();
+    const foodValues = Object.values(item).join(" ").toLowerCase();
     return foodValues.includes(searchQuery.toLowerCase());
   });
 
@@ -125,38 +127,37 @@ export default function FoodMenu({
         p={3}
         py={2}
         mb={3}
-        sx={{ background: '#fff', borderRadius: 2 }}
+        sx={{ background: "#fff", borderRadius: 2 }}
       >
         <Grid item xs={12} sx={{ mb: 1 }}>
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <Typography gutterBottom variant="h3" component="div">
-                <Tooltip
-                  TransitionComponent={Zoom}
-                  title="Refresh Menu List"
-                  arrow
-                >
-                  <IconButton onClick={fetchNeededData}>
-                    <RestartAltIcon color="dark" />
-                  </IconButton>
-                </Tooltip>{' '}
-                Menu List{' '}
+                Menu List{" "}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Box
                 display="flex"
                 borderRadius="3px"
-                backgroundColor={'#f5f5f5'}
+                backgroundColor={"#f5f5f5"}
               >
                 <InputBase
-                  sx={{ ml: 2, flex: 1, width: '0 !important' }}
+                  sx={{ ml: 2, flex: 1, width: "0 !important" }}
                   placeholder="Search"
                   onChange={handleSearchChange}
                 />
                 <IconButton type="button" sx={{ p: 1 }}>
                   <SearchIcon />
                 </IconButton>
+
+                <Button
+                  onClick={fetchNeededData}
+                  color="primary"
+                  variant="outlined"
+                >
+                  <RestartAltIcon /> Refresh
+                </Button>
               </Box>
             </Grid>
           </Grid>
@@ -169,19 +170,19 @@ export default function FoodMenu({
                 item
                 md={9}
                 xs={12}
-                sx={{ overflowX: 'auto', pb: 2 }}
+                sx={{ overflowX: "auto", pb: 2 }}
               >
                 <Typography mb={1} variant="h4">
                   Category
                 </Typography>
-                <Box display={'flex'}>
+                <Box display={"flex"}>
                   {categories.map((obj, index) => (
                     <Button
                       className={`category-button
-                   ${activeCategory === obj.category ? 'active' : ''}`}
+                   ${activeCategory === obj.category ? "active" : ""}`}
                       key={index}
                       variant={
-                        activeCategory === obj.category ? 'outlined' : 'text'
+                        activeCategory === obj.category ? "outlined" : "text"
                       }
                       onClick={() => {
                         setActiveCategory(obj.category);
@@ -194,15 +195,15 @@ export default function FoodMenu({
                 </Box>
               </Grid>
               <Grid item md={3} xs={12}>
-                <Box display={'flex'}>
+                <Box display={"flex"}>
                   <FormControl>
                     <Typography mb={1} variant="h4">
                       Type
                     </Typography>
                     <RadioGroup
                       row
-                      id={'type'}
-                      name={'type'}
+                      id={"type"}
+                      name={"type"}
                       value={type}
                       onChange={(e) => setType(e.target.value)}
                     >
@@ -249,8 +250,8 @@ export default function FoodMenu({
                       <Card
                         sx={{
                           maxWidth: 345,
-                          boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px;',
-                          height: '100%',
+                          boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
+                          height: "100%",
                         }}
                         onClick={() => {
                           if (foodStocks > 0) {
@@ -261,29 +262,29 @@ export default function FoodMenu({
                               addToCart(food);
                             }
                           } else {
-                            toast.error('Out of Stock', {
-                              position: 'top-left',
+                            toast.error("Out of Stock", {
+                              position: "top-left",
                               autoClose: true,
                               hideProgressBar: false,
                               closeOnClick: true,
                               draggable: false,
                               progress: undefined,
-                              theme: 'colored',
+                              theme: "colored",
                             });
                           }
                         }}
                       >
-                        <CardActionArea sx={{ height: '100%' }}>
+                        <CardActionArea sx={{ height: "100%" }}>
                           {/* Display out of stock message */}
                           <Box
                             sx={{
-                              position: 'absolute',
-                              background: 'red',
-                              padding: '5px',
-                              color: 'white',
-                              borderRadius: '5px',
+                              position: "absolute",
+                              background: "red",
+                              padding: "5px",
+                              color: "white",
+                              borderRadius: "5px",
                             }}
-                            display={foodStocks > 0 ? 'none' : 'block'}
+                            display={foodStocks > 0 ? "none" : "block"}
                           >
                             Out of Stock
                           </Box>
@@ -291,7 +292,7 @@ export default function FoodMenu({
                             <CardMedia
                               component="img"
                               height="140"
-                              image={food.imageUrl}
+                              image={food?.imageUrl || nofoodimage}
                               alt="Food"
                             />
                           </Box>
@@ -301,8 +302,8 @@ export default function FoodMenu({
                             <Grid
                               item
                               xs={12}
-                              display={'flex'}
-                              justifyContent={'space-between'}
+                              display={"flex"}
+                              justifyContent={"space-between"}
                             >
                               <Typography
                                 gutterBottom
@@ -311,7 +312,7 @@ export default function FoodMenu({
                               >
                                 <Capsule
                                   label={food.category}
-                                  bgcolor={'blue'}
+                                  bgcolor={"blue"}
                                 />
                               </Typography>
                               <Typography
@@ -362,14 +363,14 @@ export default function FoodMenu({
                       <ModalNoForm
                         open={modal}
                         handleClose={() => setModal(false)}
-                        title={'Choose Size'}
+                        title={"Choose Size"}
                       >
                         <Box
-                          width={'100%'}
-                          display={'flex'}
-                          justifyContent={'center'}
-                          alignItems={'center'}
-                          flexDirection={'column'}
+                          width={"100%"}
+                          display={"flex"}
+                          justifyContent={"center"}
+                          alignItems={"center"}
+                          flexDirection={"column"}
                         >
                           {/* Food image and name */}
                           <CardMedia
@@ -392,9 +393,9 @@ export default function FoodMenu({
                               <Box
                                 key={item}
                                 my={1}
-                                width={'100%'}
-                                display={'flex'}
-                                justifyContent={'space-between'}
+                                width={"100%"}
+                                display={"flex"}
+                                justifyContent={"space-between"}
                               >
                                 <Typography variant="h5">
                                   {matchingItem.name}
@@ -428,7 +429,7 @@ export default function FoodMenu({
                                     setFoodDetails();
                                   }}
                                 >
-                                  {option} <br /> PHP{' '}
+                                  {option} <br /> PHP{" "}
                                   {foodDetails.prices[index]}
                                 </Button>
                               </Grid>
@@ -459,12 +460,12 @@ export default function FoodMenu({
             </>
           ) : (
             <Box
-              width={'100%'}
-              display={'flex'}
-              justifyContent={'center'}
-              alignItems={'center'}
+              width={"100%"}
+              display={"flex"}
+              justifyContent={"center"}
+              alignItems={"center"}
             >
-              <img src={no_food} alt="" width={'80%'} />
+              <img src={no_food} alt="" width={"80%"} />
             </Box>
           )}
         </>

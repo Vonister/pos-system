@@ -1,20 +1,19 @@
 // material-ui
-import { Card, CardContent, Grid } from '@mui/material';
-import Skeleton from '@mui/material/Skeleton';
-import { global } from 'GlobalVariables';
+import { Card, CardContent, Grid } from "@mui/material";
+import Skeleton from "@mui/material/Skeleton";
 
 // ==============================|| SKELETON TOTAL GROWTH BAR CHART ||============================== //
 
 const TotalGrowthBarChart = () => (
   <Card>
     <CardContent>
-      <Grid container spacing={global.appStyle.gridSpacing}>
+      <Grid container spacing={3}>
         <Grid item xs={12}>
           <Grid
             container
             alignItems="center"
             justifyContent="space-between"
-            spacing={global.appStyle.gridSpacing}
+            spacing={3}
           >
             <Grid item xs zeroMinWidth>
               <Grid container spacing={1}>
@@ -32,7 +31,7 @@ const TotalGrowthBarChart = () => (
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <Skeleton variant="rectangular" height={530} />
+          <Skeleton variant="rectangular" height={300} />
         </Grid>
       </Grid>
     </CardContent>

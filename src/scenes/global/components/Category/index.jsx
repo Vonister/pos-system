@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import MainCard from '../../../../ui-component/cards/MainCard';
-import Table from '../../../../ui-component/datatable/Table';
+import React, { useState } from "react";
+import MainCard from "../../../../ui-component/cards/MainCard";
+import Table from "../../../../ui-component/datatable/Table";
 import {
   Button,
   FormControl,
@@ -10,29 +10,29 @@ import {
   Tooltip,
   Typography,
   Zoom,
-} from '@mui/material';
-import { saveData } from '../../../../features/saveData';
-import { useEffect } from 'react';
-import { fetchData } from '../../../../features/fetchData';
+} from "@mui/material";
+import { saveData } from "../../../../features/saveData";
+import { useEffect } from "react";
+import { fetchData } from "../../../../features/fetchData";
 
 //MUI Icons
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import Swal from 'sweetalert2';
-import { deleteData } from '../../../../features/deleteData';
-import Notification from '../../../../services/Notification';
-import { update } from 'firebase/database';
-import { updateData } from '../../../../features/updateData';
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import Swal from "sweetalert2";
+import { deleteData } from "../../../../features/deleteData";
+import Notification from "../../../../services/Notification";
+import { update } from "firebase/database";
+import { updateData } from "../../../../features/updateData";
 
 const Category = () => {
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState({
-    category: '',
+    category: "",
   });
-  const [formMode, setFormMode] = useState('Add');
+  const [formMode, setFormMode] = useState("Add");
 
   const fetchNeededData = () => {
-    fetchData('categories').then((data) => {
+    fetchData("categories").then((data) => {
       setData(data);
     });
   };
@@ -47,17 +47,17 @@ const Category = () => {
 
   const handleDelete = (item) => {
     Swal.fire({
-      icon: 'warning',
-      title: 'Are you sure you want to delete this item?',
+      icon: "warning",
+      title: "Are you sure you want to delete this item?",
       html: `This action cannot be undone once completed.`,
       showCancelButton: true,
-      confirmButtonText: 'Yes',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
       reverseButtons: true,
       focusCancel: true,
       customClass: {
-        container: 'my-swal-container',
-        popup: 'my-swal-popup',
+        container: "my-swal-container",
+        popup: "my-swal-popup",
       },
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -66,27 +66,27 @@ const Category = () => {
 
           Notification.notif({
             message: result
-              ? 'Successfully deleted the data!'
-              : 'Something went wrong.',
-            type: result ? 'success' : 'error',
+              ? "Successfully deleted the data!"
+              : "Something went wrong.",
+            type: result ? "success" : "error",
             autoClose: 3000,
-            theme: 'colored',
+            theme: "colored",
           });
 
           fetchNeededData();
         } catch (error) {
           Notification.notif({
             message: error,
-            type: 'error',
+            type: "error",
             autoClose: 3000,
-            theme: 'colored',
+            theme: "colored",
           });
         }
       }
     });
   };
 
-  const handleSubmit = (event, mode) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
     // For example, you can add the new menu item to the data state
@@ -94,8 +94,8 @@ const Category = () => {
     try {
       var result;
 
-      if (mode === 'Add') {
-        var result = saveData(formData, 'categories');
+      if (formMode === "Add") {
+        var result = saveData(formData, "categories");
       } else {
         const { id, ...restData } = formData;
         var result = updateData({ ...restData }, `categories/${id}`);
@@ -105,24 +105,24 @@ const Category = () => {
       Notification.notif({
         message: result
           ? `Successfully ${
-              mode === 'Add' ? `Added new ` : `Updated the `
+              formMode === "Add" ? `Added new ` : `Updated the `
             } data!`
-          : 'Something went wrong.',
-        type: result ? 'success' : 'error',
+          : "Something went wrong.",
+        type: result ? "success" : "error",
         autoClose: 3000,
-        theme: 'colored',
+        theme: "colored",
       });
 
       // Reset the form after submission
       setFormData({
-        category: '',
+        category: "",
       });
     } catch (error) {
       Notification.notif({
         message: error,
-        type: 'error',
+        type: "error",
         autoClose: 3000,
-        theme: 'colored',
+        theme: "colored",
       });
     }
   };
@@ -133,19 +133,19 @@ const Category = () => {
 
   const columns = [
     {
-      name: 'Category',
+      name: "Category",
       selector: (row) => row.category,
       sortable: true,
     },
     {
-      name: 'Actions',
+      name: "Actions",
       excluded: true,
       cell: (row) => (
         <>
           <Tooltip TransitionComponent={Zoom} title="Edit Data" arrow>
             <IconButton
               onClick={() => {
-                setFormMode('Edit');
+                setFormMode("Edit");
                 setFormData({ category: row.category, id: row.id });
               }}
             >
@@ -170,17 +170,17 @@ const Category = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Typography variant="h3">
-                  {formMode === 'Add'
-                    ? 'Add New Category'
-                    : 'Update Existing Data'}
+                  {formMode === "Add"
+                    ? "Add New Category"
+                    : "Update Existing Data"}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
                 <Grid container spacing={3}>
-                  {formMode !== 'Add' && (
+                  {formMode !== "Add" && (
                     <Grid item xs={12}>
                       <Button
-                        onClick={() => setFormMode('Add')}
+                        onClick={() => setFormMode("Add")}
                         variant="contained"
                       >
                         Add New Data +
@@ -189,7 +189,7 @@ const Category = () => {
                   )}
 
                   <Grid item xs={12}>
-                    <form onSubmit={(event) => handleSubmit(event, formMode)}>
+                    <form onSubmit={handleSubmit}>
                       <Typography variant="h4" sx={{ mb: 2 }}>
                         Category Information
                       </Typography>
@@ -208,15 +208,15 @@ const Category = () => {
                       <Grid
                         item
                         xs={12}
-                        sx={{ display: 'flex', justifyContent: 'end', mt: 5 }}
+                        sx={{ display: "flex", justifyContent: "end", mt: 5 }}
                       >
                         <Button
                           variant="contained"
-                          color="primary"
+                          color={formMode === "Add" ? "primary" : "success"}
                           type="submit"
                           sx={{ mx: 1 }}
                         >
-                          {formMode === 'Add' ? 'Add New Data' : 'Update Data'}
+                          {formMode === "Add" ? "Add New Data" : "Update Data"}
                         </Button>
                       </Grid>
                     </form>
@@ -227,7 +227,7 @@ const Category = () => {
           </MainCard>
         </Grid>
         <Grid item xs={8}>
-          <Table columns={columns} title={'Category List'} data={data} />;
+          <Table columns={columns} title={"Category List"} data={data} />;
         </Grid>
       </Grid>
     </>

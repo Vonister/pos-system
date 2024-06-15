@@ -1,18 +1,16 @@
-import { CssBaseline, ThemeProvider } from '@mui/material';
-import { useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import Topbar from './scenes/global/Topbar';
-import Pos from './scenes/pos';
-import { ColorModeContext, useMode } from './theme';
-import 'react-date-range/dist/styles.css'; // main css file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import "react-date-range/dist/styles.css"; // main css file
+import "react-date-range/dist/theme/default.css"; // theme css file
+import { Route, Routes } from "react-router-dom";
+import Topbar from "./scenes/global/Topbar";
+import Pos from "./scenes/pos";
+import { ColorModeContext, useMode } from "./theme";
 
-import themes from './themes';
-import ToastCon from './themes/toast';
+import themes from "./themes";
+import ToastCon from "./themes/toast";
 
 function App() {
-  const [theme, colorMode] = useMode();
-  const [isSidebar, setIsSidebar] = useState(true);
+  const [colorMode] = useMode();
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -23,7 +21,6 @@ function App() {
       >
         <CssBaseline />
         <div className="app">
-          {/* <Sidebar /> */}
           <main className="content">
             <Topbar />
             <Routes>

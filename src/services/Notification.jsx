@@ -4,7 +4,7 @@ class Notification {
   notif(props) {
     const { message, position, autoClose, theme, type } = props;
     const toastOptions = {
-      position: position || "top-right",
+      position: position || "top-center",
       autoClose: autoClose || false,
       hideProgressBar: false,
       closeOnClick: true,

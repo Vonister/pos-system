@@ -125,8 +125,8 @@ export default function Cart(props) {
         });
       }
 
-      totalCosts = totalCosts + Number(item.costs);
-      totalPrices = totalPrices + Number(item.prices);
+      totalCosts = (totalCosts + Number(item.costs)) * item.quantity;
+      totalPrices = (totalPrices + Number(item.prices)) * item.quantity;
     });
 
     var netProfit =
@@ -134,11 +134,11 @@ export default function Cart(props) {
 
     saveData(
       {
-        totalCosts,
-        totalPrices,
-        netProfit,
+        totalCosts: Number(totalCosts.toFixed(2)),
+        totalPrices: Number(totalPrices.toFixed(2)),
+        netProfit: Number(netProfit.toFixed(2)),
         discountPercent,
-        discountAmount,
+        discountAmount: Number(discountAmount.toFixed(2)),
         date: GetCurrentDate(),
         items: cartItems,
         totalNumberItems: cartItems.length,

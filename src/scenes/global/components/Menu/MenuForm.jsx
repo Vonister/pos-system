@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import MainCard from '../../../../ui-component/cards/MainCard';
+import React, { useEffect, useRef, useState } from "react";
+import MainCard from "../../../../ui-component/cards/MainCard";
 import {
   Autocomplete,
   Button,
@@ -14,14 +14,16 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { saveData } from '../../../../features/saveData';
-import CancelIcon from '@mui/icons-material/Cancel';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { AntSwitch } from '../../../../ui-component/StyledSwitch';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import { fetchData } from '../../../../features/fetchData';
+} from "@mui/material";
+import { saveData } from "../../../../features/saveData";
+import CancelIcon from "@mui/icons-material/Cancel";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { AntSwitch } from "../../../../ui-component/StyledSwitch";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import { fetchData } from "../../../../features/fetchData";
+import { updateData } from "../../../../features/updateData";
+import Notification from "../../../../services/Notification";
 
 const MenuForm = ({
   data,
@@ -34,23 +36,20 @@ const MenuForm = ({
   isLoadingTable,
   setIsLoadingTable,
   inclusionOptions,
+  formData,
+  setFormData,
+  isOption,
+  setIsOption,
+  optionCount,
+  setOptionCount,
+  formMode,
+  setFormMode,
+  selectedInclusions,
+  setSelectedInclusions,
 }) => {
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
-  const [selectedInclusions, setSelectedInclusions] = useState([]);
-  const [formData, setFormData] = useState({
-    name: '',
-    category: '',
-    options: [],
-    prices: [],
-    costs: [],
-    inclusions: [],
-    stocks: '',
-    image: null,
-  });
-  const [isOption, setIsOption] = useState(false);
 
-  const [optionCount, setOptionCount] = useState(1);
   const fileInputRef = useRef(null);
 
   const handleSelection = (event, selectedOptions) => {
@@ -62,7 +61,7 @@ const MenuForm = ({
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: name === 'image' ? event.target.files[0] : value,
+      [name]: name === "image" ? event.target.files[0] : value,
     }));
   };
 
@@ -95,46 +94,102 @@ const MenuForm = ({
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    //TODO: Saving the data of formData to the database
-    //Third argument is a table for the image if function detects that it has an object of image
-    const dbTable = isSoloMenu ? 'menu/foods' : 'menu/meals';
-    const inclusionId = selectedInclusions.map((item) => item.id);
-    const newFormdata = isSoloMenu
-      ? formData
-      : { ...formData, inclusions: inclusionId };
+    try {
+      var result;
 
-    const result = saveData(newFormdata, dbTable, 'menuImages');
+      if (formMode === "Add") {
+        //TODO: Saving the data of formData to the database
+        //Third argument is a table for the image if function detects that it has an object of image
+        const dbTable = isSoloMenu ? "menu/foods" : "menu/meals";
+        const inclusionId = selectedInclusions.map((item) => item.id);
+        const newFormdata = isSoloMenu
+          ? formData
+          : { ...formData, inclusions: inclusionId };
 
-    // For example, you can add the new menu item to the data state
-    const newData = [...data, result && newFormdata];
-    setData(newData);
+        var result = saveData(newFormdata, dbTable, "menuImages");
+      } else {
+        const { id, inclusions, options, ...restData } = formData;
+        const inclusionId = selectedInclusions.map((item) => item.id);
+        var dbtable = isSoloMenu ? `menu/foods/${id}` : `menu/meals/${id}`;
+        var data = isSoloMenu
+          ? { ...restData, ...(options && { options }) }
+          : {
+              ...restData,
+              inclusions: inclusionId,
+              ...(options && { options }),
+            };
+        var result = updateData(data, dbtable);
+      }
 
-    //call the function to sort the data by category
-    fetchNeededData();
-    // Reset the form after submission
-    setFormData({
-      name: '',
-      category: '',
-      options: [],
-      prices: [],
-      costs: [],
-      inclusions: [],
-      stocks: '',
-      image: null,
-    });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fetchNeededData();
+      Notification.notif({
+        message: result
+          ? `Successfully ${
+              formMode === "Add" ? `Added new ` : `Updated the `
+            } data!`
+          : "Something went wrong.",
+        type: result ? "success" : "error",
+        autoClose: 3000,
+        theme: "colored",
+      });
+
+      // Reset the form after submission
+      setFormData({
+        name: "",
+        category: "",
+        options: [],
+        prices: [],
+        costs: [],
+        inclusions: [],
+        stocks: "",
+        image: null,
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setIsOption(false);
+      setOptionCount(1);
+      setSelectedInclusions([]);
+    } catch (error) {
+      Notification.notif({
+        message: error,
+        type: "error",
+        autoClose: 3000,
+        theme: "colored",
+      });
     }
-    setIsOption(false);
-    setOptionCount(1);
   };
 
   return (
     <MainCard>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h3">Add New Menu </Typography>
+          <Typography variant="h3">
+            {formMode === "Add" ? "Add New" : "Edit Existing"} Menu{" "}
+          </Typography>
         </Grid>
+        {formMode !== "Add" && (
+          <Grid item xs={12}>
+            <Button
+              onClick={() => {
+                setFormMode("Add");
+                setFormData({
+                  name: "",
+                  category: "",
+                  options: [],
+                  prices: [],
+                  costs: [],
+                  inclusions: [],
+                  stocks: "",
+                  image: null,
+                });
+              }}
+              variant="contained"
+            >
+              Add New Data +
+            </Button>
+          </Grid>
+        )}
         <Grid item xs={12}>
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography>Meal</Typography>
@@ -144,7 +199,7 @@ const MenuForm = ({
                 setIsLoadingTable(!isLoadingTable);
               }}
               checked={isSoloMenu}
-              inputProps={{ 'aria-label': 'ant design' }}
+              inputProps={{ "aria-label": "ant design" }}
             />
             <Typography>Solo</Typography>
           </Stack>
@@ -195,7 +250,7 @@ const MenuForm = ({
                     multiple
                     id="mealSelect"
                     name="mealSelect"
-                    options={inclusionOptions}
+                    options={inclusionOptions ? inclusionOptions : []}
                     disableCloseOnSelect
                     disablePortal
                     sx={{ mb: 2 }}
@@ -205,16 +260,16 @@ const MenuForm = ({
                       <li
                         {...props}
                         style={{
-                          backgroundColor: selected ? '#b9e0ff75' : '#fff',
+                          backgroundColor: selected ? "#b9e0ff75" : "#fff",
                         }}
                         onMouseEnter={(e) => {
                           if (!selected) {
-                            e.target.style.background = '#b9e0ff75';
+                            e.target.style.background = "#b9e0ff75";
                           }
                         }}
                         onMouseLeave={(e) => {
                           if (!selected) {
-                            e.target.style.background = '#fff';
+                            e.target.style.background = "#fff";
                           }
                         }}
                       >
@@ -231,8 +286,8 @@ const MenuForm = ({
                       return (
                         <TextField
                           {...params}
-                          label={'Select Inclusions'}
-                          placeholder={'Select Inclusions'}
+                          label={"Select Inclusions"}
+                          placeholder={"Select Inclusions"}
                           required={
                             selectedInclusions.length > 0 ? false : true
                           }
@@ -240,7 +295,7 @@ const MenuForm = ({
                       );
                     }}
                     onChange={handleSelection}
-                    value={inclusionOptions.filter((option) =>
+                    value={inclusionOptions?.filter((option) =>
                       selectedInclusions.some(
                         (filter) => filter.name === option.name
                       )
@@ -252,7 +307,10 @@ const MenuForm = ({
                   <Grid item xs={10}>
                     <FormControlLabel
                       control={
-                        <Checkbox onClick={() => setIsOption(!isOption)} />
+                        <Checkbox
+                          checked={isOption ? true : false}
+                          onClick={() => setIsOption(!isOption)}
+                        />
                       }
                       label="Options?"
                     />
@@ -307,11 +365,11 @@ const MenuForm = ({
                                 label="Option"
                                 type="text"
                                 name={`option${index}`}
-                                value={formData.options[index] || ''}
+                                value={formData.options[index] || ""}
                                 onChange={(event) =>
                                   handleOptionChange(
                                     index,
-                                    'options',
+                                    "options",
                                     event.target.value
                                   )
                                 }
@@ -326,11 +384,11 @@ const MenuForm = ({
                                 label="Price"
                                 type="number"
                                 name={`price${index}`}
-                                value={formData.prices[index] || ''}
+                                value={formData.prices[index] || ""}
                                 onChange={(event) =>
                                   handleOptionChange(
                                     index,
-                                    'prices',
+                                    "prices",
                                     event.target.value
                                   )
                                 }
@@ -345,11 +403,11 @@ const MenuForm = ({
                                 label="Cost"
                                 type="number"
                                 name={`cost${index}`}
-                                value={formData.costs[index] || ''}
+                                value={formData.costs[index] || ""}
                                 onChange={(event) =>
                                   handleOptionChange(
                                     index,
-                                    'costs',
+                                    "costs",
                                     event.target.value
                                   )
                                 }
@@ -361,7 +419,7 @@ const MenuForm = ({
                       </Grid>
                       <Grid item xs={2}>
                         <IconButton onClick={() => handleRemoveOption(index)}>
-                          <CancelIcon color="secondary" />
+                          <CancelIcon color="error" />
                         </IconButton>
                       </Grid>
                     </Grid>
@@ -381,35 +439,40 @@ const MenuForm = ({
                   </FormControl>
                 )}
 
-                <Typography variant="h4" sx={{ mb: 1 }}>
-                  Upload an Image{' '}
-                </Typography>
-                <FormControl fullWidth sx={{ mb: 1 }}>
-                  <TextField
-                    inputRef={fileInputRef}
-                    variant="outlined"
-                    type="file"
-                    name="image"
-                    onChange={handleChange}
-                    required
-                    inputProps={{
-                      accept: 'image/*', // Accept only image files
-                    }}
-                  />
-                </FormControl>
+                {formMode === "Add" ? (
+                  <>
+                    <Typography variant="h4" sx={{ mb: 1 }}>
+                      Upload an Image{" "}
+                    </Typography>
+                    <FormControl fullWidth sx={{ mb: 1 }}>
+                      <TextField
+                        inputRef={fileInputRef}
+                        variant="outlined"
+                        type="file"
+                        name="image"
+                        onChange={handleChange}
+                        inputProps={{
+                          accept: "image/*", // Accept only image files
+                        }}
+                      />
+                    </FormControl>
+                  </>
+                ) : (
+                  ""
+                )}
 
                 <Grid
                   item
                   xs={12}
-                  sx={{ display: 'flex', justifyContent: 'end', mt: 5 }}
+                  sx={{ display: "flex", justifyContent: "end", mt: 5 }}
                 >
                   <Button
                     variant="contained"
-                    color="primary"
+                    color={formMode === "Add" ? "primary" : "success"}
                     type="submit"
                     sx={{ mx: 1 }}
                   >
-                    Add Menu
+                    {formMode === "Add" ? "Add Menu" : "Update Data"}
                   </Button>
                 </Grid>
               </form>

@@ -1,12 +1,8 @@
-import SearchIcon from "@mui/icons-material/Search";
-import { Box, Grid, IconButton, InputBase } from "@mui/material";
-import Header from "../../ui-component/Header";
-import MainCard from "../../ui-component/cards/MainCard";
+import { Box, Grid } from "@mui/material";
+import { useEffect, useState } from "react";
+import { fetchData } from "../../features/fetchData";
 import Cart from "./Cart";
 import FoodMenu from "./FoodMenu";
-import { useEffect, useState } from "react";
-import { foods } from "../../data/foodData";
-import { fetchData } from "../../features/fetchData";
 
 const Pos = () => {
   // State variables to manage cart items, subtotal, discount, payable amount, search query, and the list of foods.

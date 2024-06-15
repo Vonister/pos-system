@@ -1,20 +1,33 @@
-import { Box, Grid } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { fetchData } from '../../../../features/fetchData';
-import MenuForm from './MenuForm';
-import MenuTable from './MenuTable';
-import no_data from '../../../../assets/images/no_data.png';
+import { Box, Grid } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { fetchData } from "../../../../features/fetchData";
+import MenuForm from "./MenuForm";
+import MenuTable from "./MenuTable";
 
 const Menu = () => {
   const [data, setData] = useState([]);
   const [categoriesOption, setCategoriesOption] = useState([]);
   const [isSoloMenu, setIsSoloMenu] = useState(true);
   const [isLoadingTable, setIsLoadingTable] = useState(true);
+  const [formMode, setFormMode] = useState("Add");
   const [inclusionOptions, setInclusionOptions] = useState([]);
+  const [isOption, setIsOption] = useState(false);
+  const [selectedInclusions, setSelectedInclusions] = useState([]);
+  const [optionCount, setOptionCount] = useState(1);
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "",
+    options: [],
+    prices: [],
+    costs: [],
+    inclusions: [],
+    stocks: "",
+    image: null,
+  });
 
   const fetchNeededData = () => {
-    const dbTable = isSoloMenu ? 'menu/foods' : 'menu/meals';
-    fetchData('categories').then((data) =>
+    const dbTable = isSoloMenu ? "menu/foods" : "menu/meals";
+    fetchData("categories").then((data) =>
       setCategoriesOption(data ? data : [])
     );
 
@@ -24,7 +37,7 @@ const Menu = () => {
       if (data) {
         if (isSoloMenu) {
           //FETCH THE DATA IN MEALS WHERE AFFECTED OF THIS FOOD
-          fetchData('menu/meals').then((meals) => {
+          fetchData("menu/meals").then((meals) => {
             if (meals) {
               // Create a copy of the current data to avoid mutating the state directly
               let updatedData = data.map((food) => ({
@@ -94,16 +107,35 @@ const Menu = () => {
             setIsSoloMenu={setIsSoloMenu}
             isLoadingTable={isLoadingTable}
             setIsLoadingTable={setIsLoadingTable}
+            formData={formData}
+            setFormData={setFormData}
+            isOption={isOption}
+            setIsOption={setIsOption}
+            optionCount={optionCount}
+            setOptionCount={setOptionCount}
+            formMode={formMode}
+            setFormMode={setFormMode}
             inclusionOptions={inclusionOptions}
             setInclusionOptions={setInclusionOptions}
+            selectedInclusions={selectedInclusions}
+            setSelectedInclusions={setSelectedInclusions}
           />
         </Grid>
         <Grid item xs={8}>
           <MenuTable
             data={data}
-            isLoadingTable={isLoadingTable}
             isSoloMenu={isSoloMenu}
             fetchNeededData={fetchNeededData}
+            isLoadingTable={isLoadingTable}
+            setFormData={setFormData}
+            isOption={isOption}
+            setIsOption={setIsOption}
+            optionCount={optionCount}
+            setOptionCount={setOptionCount}
+            setFormMode={setFormMode}
+            inclusionOptions={inclusionOptions}
+            selectedInclusions={selectedInclusions}
+            setSelectedInclusions={setSelectedInclusions}
           />
         </Grid>
       </Grid>
