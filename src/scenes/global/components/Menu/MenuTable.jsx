@@ -151,27 +151,27 @@ const MenuTable = ({
 
     const { id, imageUrl, mealsAffected, ...restData } = clickedItem;
 
-    updateImage(
-      { ...restData, image: tempImage },
-      `menu/foods/${id}`,
-      "menuImages"
-    ).then((result) => {
-      Notification.notif({
-        message: result
-          ? `Successfully Updated the data!`
-          : "Something went wrong.",
-        type: result ? "success" : "error",
-        autoClose: 3000,
-        theme: "colored",
-      });
-      setTimeout(() => {
-        fetchNeededData();
-      }, 500);
+    const dbtable = isSoloMenu ? `menu/foods/${id}` : `menu/meals/${id}`;
 
-      setImageModal(false);
-      setClickedItem([]);
-      setTempImage();
-    });
+    updateImage({ ...restData, image: tempImage }, dbtable, "menuImages").then(
+      (result) => {
+        Notification.notif({
+          message: result
+            ? `Successfully Updated the data!`
+            : "Something went wrong.",
+          type: result ? "success" : "error",
+          autoClose: 3000,
+          theme: "colored",
+        });
+        setTimeout(() => {
+          fetchNeededData();
+        }, 500);
+
+        setImageModal(false);
+        setClickedItem([]);
+        setTempImage();
+      }
+    );
   };
 
   const columns = [
@@ -316,11 +316,19 @@ const MenuTable = ({
                 />
                 <Typography
                   variant="h3"
-                  mt={3}
+                  my={3}
+                  mt={5}
                   textAlign={"center"}
                   sx={{ color: "gray" }}
                 >
                   <i>Click the image to edit</i>
+                </Typography>
+
+                <Typography variant="small" sx={{ color: "gray", mt: 5 }}>
+                  <i>
+                    Click submit button without selecting image to remove the
+                    image of menu
+                  </i>
                 </Typography>
 
                 <FormControl fullWidth sx={{ mb: 1 }}>
