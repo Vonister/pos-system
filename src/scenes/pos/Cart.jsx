@@ -33,6 +33,7 @@ import GetCurrentDate from "../../services/GetCurrentDate";
 import GenerateTransactionNumber from "../../services/GenerateTransactionNumber";
 
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
+import { set } from "firebase/database";
 
 export default function Cart(props) {
   // Destructuring props
@@ -58,12 +59,24 @@ export default function Cart(props) {
   const [isDine, setIsDine] = useState("Dine In");
   const [transactionNumber, setTransactionNumber] = useState("");
   const [modeOfPayment, setModeOfPayment] = useState("Cash");
-  const [addCustomer, setAddCustomer] = useState(false);
-  const [customer, setCustomer] = useState([]);
+  const [customerDetails, setCustomerDetails] = useState({
+    customerName: "",
+    contact: "",
+    email: "",
+  });
+  const [customerModal, setCustomerModal] = useState(false);
 
   // Function to handle accordion panel changes
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
+  };
+
+  const handleCustomerChange = (event) => {
+    const { name, value } = event.target;
+    setCustomerDetails((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
 
   // Calculate totals on component mount and whenever relevant state changes
@@ -132,7 +145,7 @@ export default function Cart(props) {
     var netProfit =
       Number(totalPrices) - (Number(totalCosts) + Number(discountAmount));
 
-    saveData(
+    const result = saveData(
       {
         totalCosts: Number(totalCosts.toFixed(2)),
         totalPrices: Number(totalPrices.toFixed(2)),
@@ -145,24 +158,35 @@ export default function Cart(props) {
         isDine,
         transactionNumber,
         modeOfPayment,
+        customerDetails: customerDetails.customerName ? customerDetails : null,
       },
       "transactions"
     );
 
     Swal.fire({
-      icon: "success",
-      html: `<h3>Successful Transaction</h3>
+      icon: result ? "success" : "error",
+      html: result
+        ? `<h3>Successful Transaction</h3>
       <h2>Amount Charged: PHP ${totalPrices}</h2>
     ${change !== 0 ? ` <h2>Change: PHP ${change}</h2>` : ``}
-      `,
+      `
+        : "Something went wrong.",
     });
 
     //Return the state to initial state
     setProceedModal(false);
     setPayment(0);
     setChange(0);
+    setDiscount(0);
+    setIsDine("Dine In");
+    setModeOfPayment("Cash");
     setCartItems([]);
     fetchNeededData();
+    setCustomerDetails({
+      customerName: "",
+      contact: "",
+      email: "",
+    });
   };
 
   return (
@@ -182,24 +206,25 @@ export default function Cart(props) {
             }
             action={
               <Tooltip TransitionComponent={Zoom} title="Add Customer" arrow>
-                <Button variant="contained">
+                <Button
+                  variant="contained"
+                  onClick={() => setCustomerModal(true)}
+                >
                   <PersonAddAltIcon />
                 </Button>
               </Tooltip>
             }
             subheader={
               <Box
-                display={"flex"}
                 backgroundColor={"#ebebeb"}
                 width={"100%"}
                 p={2}
-                m={2}
                 borderRadius={2}
               >
                 <Typography variant="h4">Customer: </Typography>
-                {"  "}
+
                 <Typography mx={2} variant="h4" color={"primary"}>
-                  No Customer Name
+                  {customerDetails?.customerName || "No Customer Details"}
                 </Typography>
               </Box>
             }
@@ -309,26 +334,42 @@ export default function Cart(props) {
                 <Typography>PHP {payable.toFixed(2)}</Typography>
               </Box>
 
-              <Box display={"flex"} justifyContent={"space-between"} mt={2}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setModal(true)}
+              <Grid container spacing={3} mt={1}>
+                <Grid
+                  item
+                  lg={6}
+                  md={6}
+                  display={"flex"}
+                  justifyContent={"start"}
                 >
-                  Add Discount
-                </Button>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => {
-                    setTransactionNumber(GenerateTransactionNumber());
-                    setProceedModal(true);
-                  }}
-                  disabled={payable ? false : true}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setModal(true)}
+                  >
+                    Add Discount
+                  </Button>
+                </Grid>
+                <Grid
+                  item
+                  lg={6}
+                  md={6}
+                  display={"flex"}
+                  justifyContent={"end"}
                 >
-                  Proceed
-                </Button>
-              </Box>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => {
+                      setTransactionNumber(GenerateTransactionNumber());
+                      setProceedModal(true);
+                    }}
+                    disabled={payable ? false : true}
+                  >
+                    Proceed
+                  </Button>
+                </Grid>
+              </Grid>
             </Box>
 
             {/* Modal for adding discount */}
@@ -548,6 +589,56 @@ export default function Cart(props) {
                 </FormControl>
               </Box>
             </ModalWrapper>
+
+            <ModalNoForm
+              open={customerModal}
+              title={"Customer Details"}
+              handleClose={() => setCustomerModal(false)}
+            >
+              <Typography variant="h4" sx={{ mb: 2 }}>
+                Customer Information
+              </Typography>
+              <FormControl fullWidth sx={{ mb: 1 }}>
+                <TextField
+                  variant="outlined"
+                  label="Name"
+                  type="search"
+                  name="customerName"
+                  value={customerDetails.customerName}
+                  onChange={handleCustomerChange}
+                  required
+                />
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 1 }}>
+                <TextField
+                  variant="outlined"
+                  label="Contact Number"
+                  type="search"
+                  name="contact"
+                  value={customerDetails.contact}
+                  onChange={handleCustomerChange}
+                />
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 1 }}>
+                <TextField
+                  variant="outlined"
+                  label="Email"
+                  type="email"
+                  name="email"
+                  value={customerDetails.email}
+                  onChange={handleCustomerChange}
+                />
+              </FormControl>
+
+              <Box display={"flex"} justifyContent={"end"}>
+                <Button
+                  variant="contained"
+                  onClick={() => setCustomerModal(false)}
+                >
+                  Confirm
+                </Button>
+              </Box>
+            </ModalNoForm>
           </CardActions>
         </Card>
       </Grid>

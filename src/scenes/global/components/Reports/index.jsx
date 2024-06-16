@@ -30,6 +30,7 @@ import NoFoodIcon from "@mui/icons-material/NoFood";
 import MoneyOffIcon from "@mui/icons-material/MoneyOff";
 import DashboardSkeleton from "../../../../ui-component/cards/Skeleton/DashboardSkeleton";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
+import Capsule from "../../../../ui-component/capsule/Capsule";
 
 const Reports = () => {
   const [data, setData] = useState([]);
@@ -530,18 +531,27 @@ const Reports = () => {
                   >
                     <Box>
                       <Typography
-                        color={"primary"}
+                        color={
+                          transaction?.customerDetails?.customerName
+                            ? "primary"
+                            : "gray"
+                        }
                         variant="h5"
                         fontWeight="600"
                       >
-                        {transaction.transactionNumber}
+                        {transaction?.customerDetails?.customerName ||
+                          "No Customer Details"}
                       </Typography>
                       <Typography>
-                        {transaction.totalNumberItems} item/s
+                        {transaction.modeOfPayment} |{" "}
+                        <Capsule
+                          bgcolor={"blue"}
+                          label={transaction.transactionNumber}
+                        />
                       </Typography>
                     </Box>
                     <Box>
-                      {format(transaction.date, "MMM dd, yyyy HH:ii aa")}
+                      {format(transaction.date, "MMM dd, yyyy hh:ii aa")}
                     </Box>
                     <Box
                       backgroundColor={colors["primaryMain"]}

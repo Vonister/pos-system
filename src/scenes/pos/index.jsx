@@ -90,7 +90,7 @@ const Pos = () => {
     <Box m="20px">
       <Grid container spacing={3} p={3}>
         {/* Main content area for the menu list */}
-        <Grid item md={9} xs={12}>
+        <Grid item lg={9} md={12}>
           <FoodMenu
             foodsList={foodsList}
             cartItems={cartItems}
@@ -105,7 +105,7 @@ const Pos = () => {
         </Grid>
 
         {/* Sidebar area for the cart */}
-        <Grid item md={3} xs={12}>
+        <Grid item lg={3} md={12}>
           <Cart
             cartItems={cartItems}
             setCartItems={setCartItems}

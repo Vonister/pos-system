@@ -334,6 +334,53 @@ const History = () => {
             </Typography>
           </Box>
 
+          {clickedItem?.customerDetails && (
+            <Accordion>
+              <AccordionSummary expandIcon={<ArrowDropDownIcon />}>
+                <Typography variant="h4">Customer Details</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  mb={1}
+                  pb={1}
+                  borderBottom={"1px solid lightgray"}
+                >
+                  <Typography variant="h5">Customer Name: </Typography>
+                  <Typography variant="h5" color={"primary"}>
+                    {clickedItem?.customerDetails.customerName}
+                  </Typography>
+                </Box>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  mb={1}
+                  pb={1}
+                  borderBottom={"1px solid lightgray"}
+                >
+                  <Typography variant="h5">Contact: </Typography>
+                  <Typography variant="h5" color={"primary"}>
+                    {clickedItem?.customerDetails.contactNumber}
+                  </Typography>
+                </Box>
+
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  mb={1}
+                  pb={1}
+                  borderBottom={"1px solid lightgray"}
+                >
+                  <Typography variant="h5">Email: </Typography>
+                  <Typography variant="h5" color={"primary"}>
+                    {clickedItem?.customerDetails.email}
+                  </Typography>
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+          )}
+
           <Box
             display={"flex"}
             justifyContent={"space-between"}

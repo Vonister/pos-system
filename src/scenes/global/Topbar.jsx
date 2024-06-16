@@ -11,7 +11,7 @@ const Topbar = () => {
   const memaRef = useRef(null);
   const [settingsModal, setSettingsModal] = useState(false);
   const [selected, setSelected] = useState("");
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   return (
     <Box
       display="flex"
