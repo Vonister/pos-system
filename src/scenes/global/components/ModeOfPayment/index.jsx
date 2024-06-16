@@ -60,11 +60,11 @@ const ModeOfPayment = () => {
     <>
       <Grid container spacing={3}>
         {isLoading ? (
-          <Grid item xs={4}>
+          <Grid item md={12} lg={4}>
             <DataTableSkeleton />
           </Grid>
         ) : (
-          <Grid item xs={4}>
+          <Grid item md={12} lg={4}>
             <MainCard>
               <Grid container spacing={3}>
                 <Grid item xs={12}>

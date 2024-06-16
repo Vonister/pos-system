@@ -2,9 +2,9 @@ import {
   getDownloadURL,
   getStorage,
   ref as storageRef,
-} from 'firebase/storage';
-import app from '../firebaseConfig';
-import { getDatabase, ref, get } from 'firebase/database';
+} from "firebase/storage";
+import app from "../firebaseConfig";
+import { getDatabase, ref, get } from "firebase/database";
 
 export const fetchData = async (dbtable) => {
   const db = getDatabase(app);
@@ -22,8 +22,8 @@ export const fetchData = async (dbtable) => {
           const url = await getDownloadURL(imageRef);
           return url;
         } catch (error) {
-          console.error('Error fetching image URL:', error);
-          return '';
+          console.error("Error fetching image URL:", error);
+          return "";
         }
       };
 
@@ -37,7 +37,6 @@ export const fetchData = async (dbtable) => {
       });
 
       const dataWithUrls = await Promise.all(dataPromises);
-     
 
       return dataWithUrls;
     } else {
@@ -46,7 +45,7 @@ export const fetchData = async (dbtable) => {
     }
   } catch (error) {
     // Handle any errors that occur during fetching
-    console.error('Error fetching data:', error);
+    console.error("Error fetching data:", error);
     throw error; // Rethrow the error to be handled by the caller
   }
 };

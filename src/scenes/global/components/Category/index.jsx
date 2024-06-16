@@ -23,6 +23,7 @@ import { deleteData } from "../../../../features/deleteData";
 import Notification from "../../../../services/Notification";
 import { update } from "firebase/database";
 import { updateData } from "../../../../features/updateData";
+import DataTableSkeleton from "../../../../ui-component/cards/Skeleton/DataTableSkeleton";
 
 const Category = () => {
   const [data, setData] = useState([]);
@@ -30,10 +31,15 @@ const Category = () => {
     category: "",
   });
   const [formMode, setFormMode] = useState("Add");
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchNeededData = () => {
     fetchData("categories").then((data) => {
-      setData(data);
+      setIsLoading(false);
+      const sortedData = data.sort((a, b) =>
+        a.category.localeCompare(b.category)
+      );
+      setData(sortedData);
     });
   };
 
@@ -90,7 +96,6 @@ const Category = () => {
     event.preventDefault();
 
     // For example, you can add the new menu item to the data state
-
     try {
       var result;
 
@@ -164,72 +169,85 @@ const Category = () => {
 
   return (
     <>
-      <Grid container spacing={3}>
-        <Grid item xs={4}>
-          <MainCard>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography variant="h3">
-                  {formMode === "Add"
-                    ? "Add New Category"
-                    : "Update Existing Data"}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={3}>
-                  {formMode !== "Add" && (
-                    <Grid item xs={12}>
-                      <Button
-                        onClick={() => setFormMode("Add")}
-                        variant="contained"
-                      >
-                        Add New Data +
-                      </Button>
-                    </Grid>
-                  )}
-
-                  <Grid item xs={12}>
-                    <form onSubmit={handleSubmit}>
-                      <Typography variant="h4" sx={{ mb: 2 }}>
-                        Category Information
-                      </Typography>
-                      <FormControl fullWidth sx={{ mb: 1 }}>
-                        <TextField
-                          variant="outlined"
-                          label="Category"
-                          type="search"
-                          name="category"
-                          value={formData.category}
-                          onChange={handleChange}
-                          required
-                        />
-                      </FormControl>
-
-                      <Grid
-                        item
-                        xs={12}
-                        sx={{ display: "flex", justifyContent: "end", mt: 5 }}
-                      >
+      {isLoading ? (
+        <Grid container spacing={3}>
+          <Grid item md={12} lg={4}>
+            <DataTableSkeleton />
+          </Grid>
+          <Grid item md={12} lg={8}>
+            <DataTableSkeleton />
+          </Grid>
+        </Grid>
+      ) : (
+        <Grid container spacing={3}>
+          <Grid item md={12} lg={4}>
+            <MainCard>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Typography variant="h3">
+                    {formMode === "Add"
+                      ? "Add New Category"
+                      : "Update Existing Data"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Grid container spacing={3}>
+                    {formMode !== "Add" && (
+                      <Grid item xs={12}>
                         <Button
+                          onClick={() => setFormMode("Add")}
                           variant="contained"
-                          color={formMode === "Add" ? "primary" : "success"}
-                          type="submit"
-                          sx={{ mx: 1 }}
                         >
-                          {formMode === "Add" ? "Add New Data" : "Update Data"}
+                          Add New Data +
                         </Button>
                       </Grid>
-                    </form>
+                    )}
+
+                    <Grid item xs={12}>
+                      <form onSubmit={handleSubmit}>
+                        <Typography variant="h4" sx={{ mb: 2 }}>
+                          Category Information
+                        </Typography>
+                        <FormControl fullWidth sx={{ mb: 1 }}>
+                          <TextField
+                            variant="outlined"
+                            label="Category"
+                            type="search"
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            required
+                          />
+                        </FormControl>
+
+                        <Grid
+                          item
+                          xs={12}
+                          sx={{ display: "flex", justifyContent: "end", mt: 5 }}
+                        >
+                          <Button
+                            variant="contained"
+                            color={formMode === "Add" ? "primary" : "success"}
+                            type="submit"
+                            sx={{ mx: 1 }}
+                          >
+                            {formMode === "Add"
+                              ? "Add New Data"
+                              : "Update Data"}
+                          </Button>
+                        </Grid>
+                      </form>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-          </MainCard>
+            </MainCard>
+          </Grid>
+          <Grid item md={12} lg={8}>
+            <Table columns={columns} title={"Category List"} data={data} />;
+          </Grid>
         </Grid>
-        <Grid item xs={8}>
-          <Table columns={columns} title={"Category List"} data={data} />;
-        </Grid>
-      </Grid>
+      )}
     </>
   );
 };

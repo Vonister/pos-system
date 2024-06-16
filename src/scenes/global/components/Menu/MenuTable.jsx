@@ -9,7 +9,7 @@ import {
   Zoom,
 } from "@mui/material";
 import "firebase/storage";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import no_data from "../../../../assets/images/no_data.png";
 import DataTableSkeleton from "../../../../ui-component/cards/Skeleton/DataTableSkeleton";
 import Table from "../../../../ui-component/datatable/Table";
@@ -25,6 +25,7 @@ import Notification from "../../../../services/Notification";
 import ModalWrapper from "../../../../ui-component/ModalWrapper";
 
 import nofoodimage from "../../../../assets/images/nofoodimage.png";
+import { updateImage } from "../../../../features/updateImage";
 
 const MenuTable = ({
   data,
@@ -32,24 +33,21 @@ const MenuTable = ({
   isSoloMenu,
   fetchNeededData,
   setFormData,
-  isOption,
   setIsOption,
-  optionCount,
   setOptionCount,
   setFormMode,
   inclusionOptions,
-  selectedInclusions,
   setSelectedInclusions,
 }) => {
   const fileInputRef = useRef(null);
   const [imageModal, setImageModal] = useState(false);
   const [clickedItem, setClickedItem] = useState([]);
-  const [testImage, setTestImage] = useState();
+  const [tempImage, setTempImage] = useState();
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setTestImage(file);
+      setTempImage(file);
     }
   };
 
@@ -102,7 +100,9 @@ const MenuTable = ({
             theme: "colored",
           });
 
-          fetchNeededData();
+          setTimeout(() => {
+            fetchNeededData();
+          }, 500);
         } catch (error) {
           Notification.notif({
             message: error,
@@ -143,6 +143,34 @@ const MenuTable = ({
       stocks: data.stocks,
       image: data.image,
       id: data.id,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const { id, imageUrl, mealsAffected, ...restData } = clickedItem;
+
+    updateImage(
+      { ...restData, image: tempImage },
+      `menu/foods/${id}`,
+      "menuImages"
+    ).then((result) => {
+      Notification.notif({
+        message: result
+          ? `Successfully Updated the data!`
+          : "Something went wrong.",
+        type: result ? "success" : "error",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      setTimeout(() => {
+        fetchNeededData();
+      }, 500);
+
+      setImageModal(false);
+      setClickedItem([]);
+      setTempImage();
     });
   };
 
@@ -262,8 +290,10 @@ const MenuTable = ({
                 handleClose={() => {
                   setImageModal(false);
                   setClickedItem([]);
+                  setTempImage();
                 }}
                 title="View Image"
+                handleSubmit={handleSubmit}
               >
                 <Typography variant="h3" mb={3} textAlign={"center"}>
                   {clickedItem?.name}
@@ -272,7 +302,9 @@ const MenuTable = ({
                   component="img"
                   width="100%"
                   image={
-                    testImage ? URL.createObjectURL(testImage) : nofoodimage
+                    tempImage
+                      ? URL?.createObjectURL(tempImage)
+                      : clickedItem?.imageUrl || nofoodimage
                   }
                   alt="Food"
                   sx={{

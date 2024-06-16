@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
-import MainCard from "../../../../ui-component/cards/MainCard";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import {
   Autocomplete,
   Button,
@@ -15,21 +17,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import React, { useRef } from "react";
 import { saveData } from "../../../../features/saveData";
-import CancelIcon from "@mui/icons-material/Cancel";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { AntSwitch } from "../../../../ui-component/StyledSwitch";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import { fetchData } from "../../../../features/fetchData";
 import { updateData } from "../../../../features/updateData";
 import Notification from "../../../../services/Notification";
+import MainCard from "../../../../ui-component/cards/MainCard";
+import DataTableSkeleton from "../../../../ui-component/cards/Skeleton/DataTableSkeleton";
+import { AntSwitch } from "../../../../ui-component/StyledSwitch";
 
 const MenuForm = ({
-  data,
-  setData,
   categoriesOption,
-  setCategoriesOption,
   fetchNeededData,
   isSoloMenu,
   setIsSoloMenu,
@@ -121,7 +118,9 @@ const MenuForm = ({
         var result = updateData(data, dbtable);
       }
 
-      fetchNeededData();
+      setTimeout(() => {
+        fetchNeededData();
+      }, 500);
       Notification.notif({
         message: result
           ? `Successfully ${
@@ -161,326 +160,334 @@ const MenuForm = ({
   };
 
   return (
-    <MainCard>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Typography variant="h3">
-            {formMode === "Add" ? "Add New" : "Edit Existing"} Menu{" "}
-          </Typography>
-        </Grid>
-        {formMode !== "Add" && (
-          <Grid item xs={12}>
-            <Button
-              onClick={() => {
-                setFormMode("Add");
-                setFormData({
-                  name: "",
-                  category: "",
-                  options: [],
-                  prices: [],
-                  costs: [],
-                  inclusions: [],
-                  stocks: "",
-                  image: null,
-                });
-              }}
-              variant="contained"
-            >
-              Add New Data +
-            </Button>
-          </Grid>
-        )}
-        <Grid item xs={12}>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography>Meal</Typography>
-            <AntSwitch
-              onClick={() => {
-                setIsSoloMenu(!isSoloMenu);
-                setIsLoadingTable(!isLoadingTable);
-              }}
-              checked={isSoloMenu}
-              inputProps={{ "aria-label": "ant design" }}
-            />
-            <Typography>Solo</Typography>
-          </Stack>
-        </Grid>
-
-        {/* IF SOLO MENU IS BEING MADE, THIS FIELD WILL SHOW */}
-        <Grid item xs={12}>
+    <>
+      {isLoadingTable ? (
+        <DataTableSkeleton />
+      ) : (
+        <MainCard>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <form onSubmit={handleSubmit}>
-                <Typography variant="h4" sx={{ mb: 2 }}>
-                  Menu Information
-                </Typography>
-                <FormControl fullWidth sx={{ mb: 1 }}>
-                  <TextField
-                    variant="outlined"
-                    label="Name"
-                    type="search"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </FormControl>
-                <FormControl fullWidth sx={{ mb: 1 }}>
-                  <InputLabel id="demo-simple-select-label">
-                    Category
-                  </InputLabel>
-                  <Select
-                    id="category"
-                    name="category"
-                    value={formData.category}
-                    label="Category"
-                    onChange={handleChange}
-                  >
-                    {categoriesOption.map((option, index) => {
-                      return (
-                        <MenuItem key={index} value={option.category}>
-                          {option.category}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
+              <Typography variant="h3">
+                {formMode === "Add" ? "Add New" : "Edit Existing"} Menu{" "}
+              </Typography>
+            </Grid>
+            {formMode !== "Add" && (
+              <Grid item xs={12}>
+                <Button
+                  onClick={() => {
+                    setFormMode("Add");
+                    setFormData({
+                      name: "",
+                      category: "",
+                      options: [],
+                      prices: [],
+                      costs: [],
+                      inclusions: [],
+                      stocks: "",
+                      image: null,
+                    });
+                  }}
+                  variant="contained"
+                >
+                  Add New Data +
+                </Button>
+              </Grid>
+            )}
+            <Grid item xs={12}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography>Meal</Typography>
+                <AntSwitch
+                  onClick={() => {
+                    setIsSoloMenu(!isSoloMenu);
+                    setIsLoadingTable(!isLoadingTable);
+                  }}
+                  checked={isSoloMenu}
+                  inputProps={{ "aria-label": "ant design" }}
+                />
+                <Typography>Solo</Typography>
+              </Stack>
+            </Grid>
 
-                {!isSoloMenu && (
-                  <Autocomplete
-                    multiple
-                    id="mealSelect"
-                    name="mealSelect"
-                    options={inclusionOptions ? inclusionOptions : []}
-                    disableCloseOnSelect
-                    disablePortal
-                    sx={{ mb: 2 }}
-                    groupBy={(option) => option.category}
-                    getOptionLabel={(option) => option.name}
-                    renderOption={(props, option, { selected }) => (
-                      <li
-                        {...props}
-                        style={{
-                          backgroundColor: selected ? "#b9e0ff75" : "#fff",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!selected) {
-                            e.target.style.background = "#b9e0ff75";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!selected) {
-                            e.target.style.background = "#fff";
-                          }
-                        }}
-                      >
-                        <Checkbox
-                          icon={icon}
-                          checkedIcon={checkedIcon}
-                          style={{ marginRight: 8 }}
-                          checked={selected}
-                        />
-                        {option.name}
-                      </li>
-                    )}
-                    renderInput={(params) => {
-                      return (
-                        <TextField
-                          {...params}
-                          label={"Select Inclusions"}
-                          placeholder={"Select Inclusions"}
-                          required={
-                            selectedInclusions.length > 0 ? false : true
-                          }
-                        />
-                      );
-                    }}
-                    onChange={handleSelection}
-                    value={inclusionOptions?.filter((option) =>
-                      selectedInclusions.some(
-                        (filter) => filter.name === option.name
-                      )
-                    )}
-                  />
-                )}
-
-                <Grid container spacing={3}>
-                  <Grid item xs={10}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={isOption ? true : false}
-                          onClick={() => setIsOption(!isOption)}
-                        />
-                      }
-                      label="Options?"
-                    />
-                  </Grid>
-                  {isOption && (
-                    <Grid item xs={2}>
-                      <IconButton
-                        onClick={() => setOptionCount(optionCount + 1)}
-                      >
-                        <AddCircleOutlineIcon color="success" />
-                      </IconButton>
-                    </Grid>
-                  )}
-                </Grid>
-
-                {!isOption && (
-                  <>
-                    <FormControl fullWidth sx={{ mb: 1 }}>
-                      <TextField
-                        variant="outlined"
-                        label="Price"
-                        type="number"
-                        name="prices"
-                        value={formData.prices}
-                        onChange={handleChange}
-                        required
-                      />
-                    </FormControl>
-                    <FormControl fullWidth sx={{ mb: 1 }}>
-                      <TextField
-                        variant="outlined"
-                        label="Cost"
-                        type="number"
-                        name="costs"
-                        value={formData.costs}
-                        onChange={handleChange}
-                        required
-                      />
-                    </FormControl>
-                  </>
-                )}
-
-                {isOption &&
-                  [...Array(optionCount)].map((_, index) => (
-                    <Grid container spacing={3} key={index}>
-                      <Grid item xs={10}>
-                        <Grid container spacing={3}>
-                          <Grid item xs={4}>
-                            <FormControl fullWidth sx={{ mb: 1 }}>
-                              <TextField
-                                variant="outlined"
-                                label="Option"
-                                type="text"
-                                name={`option${index}`}
-                                value={formData.options[index] || ""}
-                                onChange={(event) =>
-                                  handleOptionChange(
-                                    index,
-                                    "options",
-                                    event.target.value
-                                  )
-                                }
-                                required
-                              />
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={4}>
-                            <FormControl fullWidth sx={{ mb: 1 }}>
-                              <TextField
-                                variant="outlined"
-                                label="Price"
-                                type="number"
-                                name={`price${index}`}
-                                value={formData.prices[index] || ""}
-                                onChange={(event) =>
-                                  handleOptionChange(
-                                    index,
-                                    "prices",
-                                    event.target.value
-                                  )
-                                }
-                                required
-                              />
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={4}>
-                            <FormControl fullWidth sx={{ mb: 1 }}>
-                              <TextField
-                                variant="outlined"
-                                label="Cost"
-                                type="number"
-                                name={`cost${index}`}
-                                value={formData.costs[index] || ""}
-                                onChange={(event) =>
-                                  handleOptionChange(
-                                    index,
-                                    "costs",
-                                    event.target.value
-                                  )
-                                }
-                                required
-                              />
-                            </FormControl>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                      <Grid item xs={2}>
-                        <IconButton onClick={() => handleRemoveOption(index)}>
-                          <CancelIcon color="error" />
-                        </IconButton>
-                      </Grid>
-                    </Grid>
-                  ))}
-
-                {isSoloMenu && (
-                  <FormControl fullWidth sx={{ mb: 1 }}>
-                    <TextField
-                      variant="outlined"
-                      label="Stocks"
-                      type="number"
-                      name="stocks"
-                      value={formData.stocks}
-                      onChange={handleChange}
-                      required
-                    />
-                  </FormControl>
-                )}
-
-                {formMode === "Add" ? (
-                  <>
-                    <Typography variant="h4" sx={{ mb: 1 }}>
-                      Upload an Image{" "}
+            {/* IF SOLO MENU IS BEING MADE, THIS FIELD WILL SHOW */}
+            <Grid item xs={12}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <form onSubmit={handleSubmit}>
+                    <Typography variant="h4" sx={{ mb: 2 }}>
+                      Menu Information
                     </Typography>
                     <FormControl fullWidth sx={{ mb: 1 }}>
                       <TextField
-                        inputRef={fileInputRef}
                         variant="outlined"
-                        type="file"
-                        name="image"
+                        label="Name"
+                        type="search"
+                        name="name"
+                        value={formData.name}
                         onChange={handleChange}
-                        inputProps={{
-                          accept: "image/*", // Accept only image files
-                        }}
+                        required
                       />
                     </FormControl>
-                  </>
-                ) : (
-                  ""
-                )}
+                    <FormControl fullWidth sx={{ mb: 1 }}>
+                      <InputLabel id="demo-simple-select-label">
+                        Category
+                      </InputLabel>
+                      <Select
+                        id="category"
+                        name="category"
+                        value={formData.category}
+                        label="Category"
+                        onChange={handleChange}
+                      >
+                        {categoriesOption.map((option, index) => {
+                          return (
+                            <MenuItem key={index} value={option.category}>
+                              {option.category}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </FormControl>
 
-                <Grid
-                  item
-                  xs={12}
-                  sx={{ display: "flex", justifyContent: "end", mt: 5 }}
-                >
-                  <Button
-                    variant="contained"
-                    color={formMode === "Add" ? "primary" : "success"}
-                    type="submit"
-                    sx={{ mx: 1 }}
-                  >
-                    {formMode === "Add" ? "Add Menu" : "Update Data"}
-                  </Button>
+                    {!isSoloMenu && (
+                      <Autocomplete
+                        multiple
+                        id="mealSelect"
+                        name="mealSelect"
+                        options={inclusionOptions ? inclusionOptions : []}
+                        disableCloseOnSelect
+                        disablePortal
+                        sx={{ mb: 2 }}
+                        groupBy={(option) => option.category}
+                        getOptionLabel={(option) => option.name}
+                        renderOption={(props, option, { selected }) => (
+                          <li
+                            {...props}
+                            style={{
+                              backgroundColor: selected ? "#b9e0ff75" : "#fff",
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!selected) {
+                                e.target.style.background = "#b9e0ff75";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!selected) {
+                                e.target.style.background = "#fff";
+                              }
+                            }}
+                          >
+                            <Checkbox
+                              icon={icon}
+                              checkedIcon={checkedIcon}
+                              style={{ marginRight: 8 }}
+                              checked={selected}
+                            />
+                            {option.name}
+                          </li>
+                        )}
+                        renderInput={(params) => {
+                          return (
+                            <TextField
+                              {...params}
+                              label={"Select Inclusions"}
+                              placeholder={"Select Inclusions"}
+                              required={
+                                selectedInclusions.length > 0 ? false : true
+                              }
+                            />
+                          );
+                        }}
+                        onChange={handleSelection}
+                        value={inclusionOptions?.filter((option) =>
+                          selectedInclusions.some(
+                            (filter) => filter.name === option.name
+                          )
+                        )}
+                      />
+                    )}
+
+                    <Grid container spacing={3}>
+                      <Grid item xs={10}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={isOption ? true : false}
+                              onClick={() => setIsOption(!isOption)}
+                            />
+                          }
+                          label="Options?"
+                        />
+                      </Grid>
+                      {isOption && (
+                        <Grid item xs={2}>
+                          <IconButton
+                            onClick={() => setOptionCount(optionCount + 1)}
+                          >
+                            <AddCircleOutlineIcon color="success" />
+                          </IconButton>
+                        </Grid>
+                      )}
+                    </Grid>
+
+                    {!isOption && (
+                      <>
+                        <FormControl fullWidth sx={{ mb: 1 }}>
+                          <TextField
+                            variant="outlined"
+                            label="Price"
+                            type="number"
+                            name="prices"
+                            value={formData.prices}
+                            onChange={handleChange}
+                            required
+                          />
+                        </FormControl>
+                        <FormControl fullWidth sx={{ mb: 1 }}>
+                          <TextField
+                            variant="outlined"
+                            label="Cost"
+                            type="number"
+                            name="costs"
+                            value={formData.costs}
+                            onChange={handleChange}
+                            required
+                          />
+                        </FormControl>
+                      </>
+                    )}
+
+                    {isOption &&
+                      [...Array(optionCount)].map((_, index) => (
+                        <Grid container spacing={3} key={index}>
+                          <Grid item xs={10}>
+                            <Grid container spacing={3}>
+                              <Grid item xs={4}>
+                                <FormControl fullWidth sx={{ mb: 1 }}>
+                                  <TextField
+                                    variant="outlined"
+                                    label="Option"
+                                    type="text"
+                                    name={`option${index}`}
+                                    value={formData.options[index] || ""}
+                                    onChange={(event) =>
+                                      handleOptionChange(
+                                        index,
+                                        "options",
+                                        event.target.value
+                                      )
+                                    }
+                                    required
+                                  />
+                                </FormControl>
+                              </Grid>
+                              <Grid item xs={4}>
+                                <FormControl fullWidth sx={{ mb: 1 }}>
+                                  <TextField
+                                    variant="outlined"
+                                    label="Price"
+                                    type="number"
+                                    name={`price${index}`}
+                                    value={formData.prices[index] || ""}
+                                    onChange={(event) =>
+                                      handleOptionChange(
+                                        index,
+                                        "prices",
+                                        event.target.value
+                                      )
+                                    }
+                                    required
+                                  />
+                                </FormControl>
+                              </Grid>
+                              <Grid item xs={4}>
+                                <FormControl fullWidth sx={{ mb: 1 }}>
+                                  <TextField
+                                    variant="outlined"
+                                    label="Cost"
+                                    type="number"
+                                    name={`cost${index}`}
+                                    value={formData.costs[index] || ""}
+                                    onChange={(event) =>
+                                      handleOptionChange(
+                                        index,
+                                        "costs",
+                                        event.target.value
+                                      )
+                                    }
+                                    required
+                                  />
+                                </FormControl>
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={2}>
+                            <IconButton
+                              onClick={() => handleRemoveOption(index)}
+                            >
+                              <CancelIcon color="error" />
+                            </IconButton>
+                          </Grid>
+                        </Grid>
+                      ))}
+
+                    {isSoloMenu && (
+                      <FormControl fullWidth sx={{ mb: 1 }}>
+                        <TextField
+                          variant="outlined"
+                          label="Stocks"
+                          type="number"
+                          name="stocks"
+                          value={formData.stocks}
+                          onChange={handleChange}
+                          required
+                        />
+                      </FormControl>
+                    )}
+
+                    {formMode === "Add" ? (
+                      <>
+                        <Typography variant="h4" sx={{ mb: 1 }}>
+                          Upload an Image{" "}
+                        </Typography>
+                        <FormControl fullWidth sx={{ mb: 1 }}>
+                          <TextField
+                            inputRef={fileInputRef}
+                            variant="outlined"
+                            type="file"
+                            name="image"
+                            onChange={handleChange}
+                            inputProps={{
+                              accept: "image/*", // Accept only image files
+                            }}
+                          />
+                        </FormControl>
+                      </>
+                    ) : (
+                      ""
+                    )}
+
+                    <Grid
+                      item
+                      xs={12}
+                      sx={{ display: "flex", justifyContent: "end", mt: 5 }}
+                    >
+                      <Button
+                        variant="contained"
+                        color={formMode === "Add" ? "primary" : "success"}
+                        type="submit"
+                        sx={{ mx: 1 }}
+                      >
+                        {formMode === "Add" ? "Add Menu" : "Update Data"}
+                      </Button>
+                    </Grid>
+                  </form>
                 </Grid>
-              </form>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </Grid>
-    </MainCard>
+        </MainCard>
+      )}
+    </>
   );
 };
 

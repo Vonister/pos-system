@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { fetchData } from "../../../../features/fetchData";
 import MenuForm from "./MenuForm";
@@ -96,12 +96,9 @@ const Menu = () => {
   return (
     <>
       <Grid container spacing={3}>
-        <Grid item xs={4}>
+        <Grid item lg={4} md={12}>
           <MenuForm
-            data={data}
-            setData={setData}
             categoriesOption={categoriesOption}
-            setCategoriesOption={setCategoriesOption}
             fetchNeededData={fetchNeededData}
             isSoloMenu={isSoloMenu}
             setIsSoloMenu={setIsSoloMenu}
@@ -121,20 +118,17 @@ const Menu = () => {
             setSelectedInclusions={setSelectedInclusions}
           />
         </Grid>
-        <Grid item xs={8}>
+        <Grid item lg={8} md={12}>
           <MenuTable
             data={data}
             isSoloMenu={isSoloMenu}
             fetchNeededData={fetchNeededData}
             isLoadingTable={isLoadingTable}
             setFormData={setFormData}
-            isOption={isOption}
             setIsOption={setIsOption}
-            optionCount={optionCount}
             setOptionCount={setOptionCount}
             setFormMode={setFormMode}
             inclusionOptions={inclusionOptions}
-            selectedInclusions={selectedInclusions}
             setSelectedInclusions={setSelectedInclusions}
           />
         </Grid>

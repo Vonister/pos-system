@@ -1,6 +1,14 @@
 import CancelIcon from "@mui/icons-material/Cancel";
 import EmailIcon from "@mui/icons-material/Email";
-import { Box, Grid, IconButton, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+  Zoom,
+} from "@mui/material";
 import { PieChart } from "@mui/x-charts";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { format, subDays } from "date-fns";
@@ -21,6 +29,7 @@ import DiscountIcon from "@mui/icons-material/Discount";
 import NoFoodIcon from "@mui/icons-material/NoFood";
 import MoneyOffIcon from "@mui/icons-material/MoneyOff";
 import DashboardSkeleton from "../../../../ui-component/cards/Skeleton/DashboardSkeleton";
+import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 
 const Reports = () => {
   const [data, setData] = useState([]);
@@ -81,17 +90,12 @@ const Reports = () => {
     let popularItems = [];
     let lineChartData = [
       {
-        id: "Net Profits",
+        id: "Gross Profits",
         color: colors["primaryMain"],
         data: [],
       },
       {
-        id: "Cost",
-        color: colors["errorMain"],
-        data: [],
-      },
-      {
-        id: "Revenue",
+        id: "Net Revenue",
         color: colors["secondaryMain"],
         data: [],
       },
@@ -126,19 +130,17 @@ const Reports = () => {
           categoryCounts[category] = (categoryCounts[category] || 0) + quantity;
 
           //CHECK IF THE ITEM IS REFUNDED
-
           if (item.status === "Refunded") {
-            refundedItems += 1;
-            refundedAmount += Number(item.prices);
-            netProfit -= Number(item.prices);
-            amountCharged -= Number(item.prices);
+            refundedItems += 1 * item.quantity;
+            refundedAmount += Number(item.prices) * Number(item.quantity);
           }
+
+          totalItems += item.quantity;
         });
 
         netProfit += transaction.netProfit;
         amountCharged += transaction.totalPrices;
         totalCost += transaction.totalCosts;
-        totalItems += transaction.items.length;
         amountDiscounted += transaction.discountAmount;
         totalTransaction += 1;
         recentTransactions.push(transaction);
@@ -150,7 +152,6 @@ const Reports = () => {
     while (currentDate <= toDate) {
       // Format currentDate as "yyyy-MM-dd"
       const formattedDate = format(currentDate, "yyyy-MM-dd");
-
       transactions.forEach((transaction) => {
         const transactionDate = format(transaction.date, "yyyy-MM-dd");
 
@@ -162,45 +163,65 @@ const Reports = () => {
           if (existingItem) {
             // If item already exists, update its value
 
-            //NET PROFITS
+            //GROSS PROFITS
             lineChartData[0].data = lineChartData[0].data.map((lineData) =>
               lineData.x === format(transaction.date, "MMM-dd")
-                ? { ...lineData, y: lineData.y + transaction.netProfit }
+                ? {
+                    ...lineData,
+                    y:
+                      lineData.y +
+                      (transaction.totalPrices - transaction.totalCosts),
+                  }
                 : lineData
             );
 
-            //TOTAL COST
+            var refunds = 0;
+
+            transaction.items.map((transact) => {
+              //CHECK IF THE ITEM IS REFUNDED
+              if (transact.status === "Refunded") {
+                refunds += Number(transact.prices) * Number(transact.quantity);
+              }
+              return refunds;
+            });
+
+            //NET Revenue
             lineChartData[1].data = lineChartData[1].data.map((lineData) =>
               lineData.x === format(transaction.date, "MMM-dd")
-                ? { ...lineData, y: lineData.y + transaction.totalCosts }
-                : lineData
-            );
-
-            //Revenue
-            lineChartData[2].data = lineChartData[2].data.map((lineData) =>
-              lineData.x === format(transaction.date, "MMM-dd")
-                ? { ...lineData, y: lineData.y + transaction.totalPrices }
+                ? {
+                    ...lineData,
+                    y:
+                      lineData.y +
+                      (transaction.totalPrices -
+                        (transaction.discountAmount + refunds)),
+                  }
                 : lineData
             );
           } else {
             // If item doesn't exist, create a new object
 
-            //NET PROFITS
+            //GROSS PROFITS
             lineChartData[0].data.push({
               x: format(transaction.date, "MMM-dd"),
-              y: transaction.netProfit,
+              y: transaction.totalPrices - transaction.totalCosts,
             });
 
-            //TOTAL COST
+            var refunds = 0;
+
+            transaction.items.map((transact) => {
+              //CHECK IF THE ITEM IS REFUNDED
+              if (transact.status === "Refunded") {
+                refunds += Number(transact.prices) * Number(transact.quantity);
+              }
+              return refunds;
+            });
+
+            //NET REVENUE
             lineChartData[1].data.push({
               x: format(transaction.date, "MMM-dd"),
-              y: transaction.totalCosts,
-            });
-
-            //Revenue
-            lineChartData[2].data.push({
-              x: format(transaction.date, "MMM-dd"),
-              y: transaction.totalPrices,
+              y:
+                transaction.totalPrices -
+                (transaction.discountAmount + refunds),
             });
           }
         }
@@ -310,24 +331,32 @@ const Reports = () => {
           <Grid container spacing={3} mb={3}>
             <Grid item xl={3} lg={4} md={6} xs={12}>
               <StatBox
-                title={`₱ ${data?.netProfit?.toFixed(2)}`}
-                subtitle="Profit"
+                title={`₱ ${data?.amountCharged?.toFixed(2)}`}
+                tooltip="Total Amount Charged"
+                subtitle="Gross Sales"
+                color="success"
+                icon={
+                  <LocalAtmIcon color="success" sx={{ fontSize: "40px" }} />
+                }
+              />
+            </Grid>
+
+            <Grid item xl={3} lg={4} md={6} xs={12}>
+              <StatBox
+                title={`₱ ${(
+                  data?.amountCharged -
+                  (data?.amountDiscounted +
+                    data?.refundedAmount +
+                    data?.totalCost)
+                ).toFixed(2)}`}
+                subtitle="Net Profit"
+                tooltip="Difference between the Gross Sales and Total Expenses"
                 color="primary"
                 icon={
                   <MonetizationOnIcon
                     color="primary"
                     sx={{ fontSize: "40px" }}
                   />
-                }
-              />
-            </Grid>
-            <Grid item xl={3} lg={4} md={6} xs={12}>
-              <StatBox
-                title={`₱ ${data?.amountCharged?.toFixed(2)}`}
-                subtitle="Revenue"
-                color="success"
-                icon={
-                  <LocalAtmIcon color="success" sx={{ fontSize: "40px" }} />
                 }
               />
             </Grid>
@@ -408,14 +437,52 @@ const Reports = () => {
                 >
                   <Box>
                     <Typography variant="h5" fontWeight="600">
-                      Revenue Generated
+                      Gross Profit{" "}
+                      <Tooltip
+                        TransitionComponent={Zoom}
+                        title={
+                          "Difference between the Gross Sales and Total Cost"
+                        }
+                        arrow
+                      >
+                        <IconButton>
+                          <ContactSupportIcon color="gray" />
+                        </IconButton>
+                      </Tooltip>
                     </Typography>
                     <Typography
                       variant="h3"
                       fontWeight="bold"
                       color={"primary"}
                     >
-                      P {data?.amountCharged?.toFixed(2)}
+                      ₱ {(data?.amountCharged - data?.totalCost).toFixed(2)}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="h5" fontWeight="600">
+                      Net Revenue{" "}
+                      <Tooltip
+                        TransitionComponent={Zoom}
+                        title={
+                          "Difference between the Gross Sales and Sum of Refunds and Discount"
+                        }
+                        arrow
+                      >
+                        <IconButton>
+                          <ContactSupportIcon color="gray" />
+                        </IconButton>
+                      </Tooltip>
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      fontWeight="bold"
+                      color={"primary"}
+                    >
+                      ₱{" "}
+                      {(
+                        data?.amountCharged -
+                        (data?.amountDiscounted + data?.refundedAmount)
+                      ).toFixed(2)}
                     </Typography>
                   </Box>
                 </Box>
