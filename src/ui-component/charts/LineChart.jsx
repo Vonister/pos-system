@@ -1,6 +1,4 @@
 import { ResponsiveLine } from "@nivo/line";
-import { useTheme } from "@mui/material";
-import { tokens } from "../../theme";
 // import { mockLineData as data } from "../../data/mockData";
 
 const LineChart = ({
@@ -8,9 +6,6 @@ const LineChart = ({
   isDashboard = false,
   data,
 }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-
   return (
     <ResponsiveLine
       data={data}
@@ -18,32 +13,32 @@ const LineChart = ({
         axis: {
           domain: {
             line: {
-              stroke: colors.grey[100],
+              stroke: "#141414",
             },
           },
           legend: {
             text: {
-              fill: colors.grey[100],
+              fill: "#141414",
             },
           },
           ticks: {
             line: {
-              stroke: colors.grey[100],
+              stroke: "#141414",
               strokeWidth: 1,
             },
             text: {
-              fill: colors.grey[100],
+              fill: "#141414",
             },
           },
         },
         legends: {
           text: {
-            fill: colors.grey[100],
+            fill: "#141414",
           },
         },
         tooltip: {
           container: {
-            color: colors.primary[500],
+            color: "#666666",
           },
         },
       }}

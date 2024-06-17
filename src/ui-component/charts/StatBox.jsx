@@ -1,3 +1,4 @@
+import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 import {
   Box,
   IconButton,
@@ -6,9 +7,6 @@ import {
   useTheme,
   Zoom,
 } from "@mui/material";
-import { tokens } from "../../theme";
-import ProgressCircle from "./ProgressCircle";
-import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 const StatBox = ({
   title,
   tooltip = "",
@@ -19,7 +17,6 @@ const StatBox = ({
   increase,
 }) => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
   return (
     <Box
