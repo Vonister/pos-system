@@ -150,9 +150,7 @@ const MenuTable = ({
     e.preventDefault();
 
     const { id, imageUrl, mealsAffected, ...restData } = clickedItem;
-
     const dbtable = isSoloMenu ? `menu/foods/${id}` : `menu/meals/${id}`;
-
     updateImage({ ...restData, image: tempImage }, dbtable, "menuImages").then(
       (result) => {
         Notification.notif({
